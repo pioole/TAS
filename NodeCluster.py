@@ -11,26 +11,26 @@ utilization = []
 
 class NodeCluster(object):
     def __init__(self, input):
-        # initial a 3d array with all 0 number included
+        """initial a 3d array with all 0 number included"""
         global side
         side = input
         self.sidenumber = input
         self.matrix = zeros((side, side, side))
 
     def returnMatrix(self):
-        # return the matrix
+        """return the matrix"""
         return self.matrix
 
     def returnValue(self, x, y, z):
-        # return the
+        """return the"""
         return self.matrix[x, y, z]
 
     def changeValue(self, x, y, z, value):
-        # change one point in matrix to be a value we want
+        """change one point in matrix to be a value we want"""
         self.matrix[x, y, z] = value
 
     def getMaxCuboid(self):
-        # in 3d dimensions to get the largest Cuboid inside
+        """in 3d dimensions to get the largest Cuboid inside"""
         matlist = self.matrix
         maxvol = 0
         maxarea = 0
@@ -47,7 +47,7 @@ class NodeCluster(object):
         return {"maxvol": maxvol, "maxarea": maxarea, "maxindex": maxindex}
 
     def generateOverlappedSet(self, mat1):
-        # get the overlapped matrix by mat1
+        """get the overlapped matrix by mat1"""
         tempmat = zeros((len(mat1) - 1, self.sidenumber, self.sidenumber))
         for i in xrange(len(mat1) - 1):
             for x in xrange(self.sidenumber):
@@ -58,7 +58,7 @@ class NodeCluster(object):
         return tempmat
 
     def getMaxSubsets(self):
-        # get the largest subset matrix from each single matrix
+        """get the largest subset matrix from each single matrix"""
         maxmatrixlist = []
         for i in xrange(len(self.matrix)):
             maxmatrixlist.append({"index": i, "matrix": max_size(self.matrix[i])})
