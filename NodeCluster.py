@@ -353,7 +353,7 @@ with open('result0', 'w') as f:
     for each in utilization:
         time = each['time']
         util = each['util']
-        f.write(str(time) + "," + str(util) + '\n')
+        f.write('{},{}\n'.format(str(time), str(util)))
 
 print a.getMaxCuboid()
 print runningprocess
