@@ -20,56 +20,20 @@ class JobQueue(object):
         my_randoms = [random.choice(xrange(50, 101)) for _ in range(172)]
         sizelist += my_randoms
         random.shuffle(sizelist)
+
         # timelist was used to generate random time that used to generate sample jobs
         timelist = []
-        my_randoms = [random.choice(xrange(1, 61)) for _ in range(2407)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(61, 121)) for _ in range(465)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(121, 181)) for _ in range(93)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(181, 241)) for _ in range(84)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(241, 301)) for _ in range(190)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(301, 361)) for _ in range(123)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(361, 421)) for _ in range(75)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(421, 481)) for _ in range(61)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(481, 541)) for _ in range(90)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(541, 601)) for _ in range(93)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(601, 661)) for _ in range(68)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(661, 721)) for _ in range(50)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(721, 781)) for _ in range(47)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(781, 841)) for _ in range(33)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(841, 901)) for _ in range(50)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(901, 961)) for _ in range(37)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(961, 1021)) for _ in range(68)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1021, 1081)) for _ in range(106)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1081, 1141)) for _ in range(131)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1141, 1201)) for _ in range(107)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1201, 1261)) for _ in range(85)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1261, 1321)) for _ in range(109)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1321, 1381)) for _ in range(104)]
-        timelist += my_randoms
-        my_randoms = [random.choice(xrange(1381, 1441)) for _ in range(324)]
-        timelist += my_randoms
+        range_list = [(1, 61, 2407), (61, 121, 465), (121, 181, 93), (181, 241, 84), (241, 301, 190), (301, 361, 123),
+                      (361, 421, 75), (421, 481, 61), (481, 541, 90), (541, 601, 93), (601, 661, 68), (661, 721, 50),
+                      (721, 781, 47), (781, 841, 33), (841, 901, 50), (901, 961, 37), (961, 1021, 68),
+                      (1021, 1081, 106), (1081, 1141, 131), (1141, 1201, 107), (1201, 1261, 85), (1261, 1321, 109),
+                      (1321, 1381, 104), (1381, 1441, 324)
+                      ]
+
+        for range_input in range_list:
+            my_randoms = [random.choice(xrange(range_input[0], range_input[1])) for _ in range(range_input[2])]
+            timelist += my_randoms
+
         random.shuffle(timelist)
 
         for i in xrange(5000):
