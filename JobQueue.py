@@ -55,5 +55,3 @@ class JobQueue(object):
 
 
 q1 = JobQueue()
-# print len(q1.generate_query(3))
-# print q1.list[1010].returnFlag()
