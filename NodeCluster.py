@@ -344,7 +344,7 @@ def main():
     print a.cal_utilization()
     # print(a.get_value(2,4,5))
     q1 = JobQueue()
-    q = q1.QueryGenerate(3)
+    q = q1.generate_query(3)
 
     while len(q) > 0:
         q = a.insert_to_max_cuboid(q)

@@ -9,7 +9,7 @@ class JobQueue(object):
         self.quantity = quantity
         self.list = []
 
-    def QueryGenerate(self, flag=0):
+    def generate_query(self, flag=0):
         # generate quantity number of sample jobs in queue
         # sizelist was used to generate random size that used to generate sample jobs
         sizelist = 3679 * [1]
@@ -51,5 +51,5 @@ class JobQueue(object):
 
 
 q1 = JobQueue()
-# print len(q1.QueryGenerate(3))
+# print len(q1.generate_query(3))
 # print q1.list[1010].returnFlag()
