@@ -54,4 +54,9 @@ class JobQueue(object):
         return self.list.pop()
 
 
-q1 = JobQueue()
+def main():
+    q1 = JobQueue()
+
+if __name__ == "__main__":
+    main()
+
