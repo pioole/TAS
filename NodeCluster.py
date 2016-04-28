@@ -3,7 +3,7 @@ from MaxRecSize import mul, max_size
 from JobQueue import JobQueue
 
 time = 0
-runningprocess = []
+running_process = []
 side = 0
 utilization = []
 
@@ -13,7 +13,7 @@ class NodeCluster(object):
         """initial a 3d array with all 0 number included"""
         global side
         side = input
-        self.sidenumber = input
+        self.side_number = input
         self.matrix = np.zeros((side, side, side))
 
     def get_matrix(self):
@@ -30,168 +30,168 @@ class NodeCluster(object):
 
     def get_max_cuboid(self):
         """in 3d dimensions to get the largest Cuboid inside"""
-        matlist = self.matrix
-        maxvol = 0
-        maxarea = 0
-        maxindex = 0
+        mat_list = self.matrix
+        max_vol = 0
+        max_area = 0
+        max_index = 0
         level = 1
-        while len(matlist) > 0:
-            for index, each in enumerate(matlist):
-                if reduce(mul, max_size(each)[0]) * level > maxvol:
-                    maxvol = reduce(mul, max_size(each)[0]) * level
-                    maxarea = max_size(each)
-                    maxindex = [index, level]
-            matlist = self.generate_overlapped_set(matlist)
+        while len(mat_list) > 0:
+            for index, each in enumerate(mat_list):
+                if reduce(mul, max_size(each)[0]) * level > max_vol:
+                    max_vol = reduce(mul, max_size(each)[0]) * level
+                    max_area = max_size(each)
+                    max_index = [index, level]
+            mat_list = self.generate_overlapped_set(mat_list)
             level += 1
-        return {"maxvol": maxvol, "maxarea": maxarea, "maxindex": maxindex}
+        return {"maxvol": max_vol, "maxarea": max_area, "maxindex": max_index}
 
     def generate_overlapped_set(self, mat1):
         """get the overlapped matrix by mat1"""
-        tempmat = np.zeros((len(mat1) - 1, self.sidenumber, self.sidenumber))
+        temp_mat = np.zeros((len(mat1) - 1, self.side_number, self.side_number))
         for i in xrange(len(mat1) - 1):
-            for x in xrange(self.sidenumber):
-                for y in xrange(self.sidenumber):
+            for x in xrange(self.side_number):
+                for y in xrange(self.side_number):
                     val = mat1[i, x, y] or mat1[i + 1, x, y]
-                    tempmat[i, x, y] = val
+                    temp_mat[i, x, y] = val
 
-        return tempmat
+        return temp_mat
 
     def get_max_subsets(self):
         """get the largest subset matrix from each single matrix"""
-        maxmatrixlist = []
+        max_matrix_list = []
         for i in xrange(len(self.matrix)):
-            maxmatrixlist.append({"index": i, "matrix": max_size(self.matrix[i])})
+            max_matrix_list.append({"index": i, "matrix": max_size(self.matrix[i])})
 
-        maxmatrixlist = sorted(maxmatrixlist, key=lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
-        return maxmatrixlist
+        max_matrix_list = sorted(max_matrix_list, key=lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
+        return max_matrix_list
 
     def insert_to_max_cuboid(self, queue):
         global time
-        global runningprocess
+        global running_process
         global utilization
 
-        maxcuboid = self.get_max_cuboid()
-        startindex = maxcuboid["maxindex"][0]
-        endindex = maxcuboid["maxindex"][0] + maxcuboid["maxindex"][1] - 1
+        max_cuboid = self.get_max_cuboid()
+        start_index = max_cuboid["maxindex"][0]
+        end_index = max_cuboid["maxindex"][0] + max_cuboid["maxindex"][1] - 1
 
-        mat = maxcuboid["maxarea"]
-        startcoodx = mat[1] + 1 - mat[0][0]
-        startcoody = mat[2]
-        endcoodx = mat[1]
-        endcoody = mat[3]
-        rowlength = mat[0][0]
-        collength = mat[0][1]
+        mat = max_cuboid["maxarea"]
+        start_cood_x = mat[1] + 1 - mat[0][0]
+        start_cood_y = mat[2]
+        end_cood_x = mat[1]
+        end_cood_y = mat[3]
+        row_length = mat[0][0]
+        col_length = mat[0][1]
 
-        coodlist = []
-        for x in xrange(startcoodx, endcoodx + 1):
-            for y in xrange(startcoody, endcoody + 1):
-                coodlist.append([x, y])
+        cood_list = []
+        for x in xrange(start_cood_x, end_cood_x + 1):
+            for y in xrange(start_cood_y, end_cood_y + 1):
+                cood_list.append([x, y])
 
-        headstarti = 0
-        headendi = len(coodlist) - 1
+        head_start_i = 0
+        head_end_i = len(cood_list) - 1
 
-        tailstarti = 0
-        tailendi = len(coodlist) - 1
-        print "tailendi originally = " + str(tailendi)
+        tail_start_i = 0
+        tail_end_i = len(cood_list) - 1
+        print "tailendi originally = " + str(tail_end_i)
 
         while True:
 
             if len(queue) > 0:
-                currentjob = queue[len(queue) - 1]
+                current_job = queue[len(queue) - 1]
                 print "length of queue" + str(len(queue))
             else:
                 print "Queue is empty"
                 break
 
-            jobsize = currentjob.returnSize()
+            job_size = current_job.returnSize()
 
-            if startindex < endindex:
+            if start_index < end_index:
 
-                if currentjob.returnFlag() == 1:
+                if current_job.returnFlag() == 1:
 
                     # start to check if we can place the job into the matrix
-                    if jobsize % collength != 0:
-                        requiredspace = (jobsize / collength + 1) * collength
+                    if job_size % col_length != 0:
+                        required_space = (job_size / col_length + 1) * col_length
                     else:
-                        requiredspace = jobsize
+                        required_space = job_size
 
-                    if requiredspace <= headendi - headstarti + 1:
+                    if required_space <= head_end_i - head_start_i + 1:
                         # job can be placed in
                         cood = []
-                        for i in xrange(headstarti, headstarti + jobsize):
-                            self.matrix[startindex, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                            cood.append([startindex, coodlist[i][0], coodlist[i][1]])
-                        if jobsize % collength != 0:
-                            for i in xrange(headstarti + jobsize, headstarti + (jobsize / collength + 1) * collength):
-                                self.matrix[startindex, coodlist[i][0], coodlist[i][1]] = -currentjob.returnId()
-                                cood.append([startindex, coodlist[i][0], coodlist[i][1]])
-                            headstarti = headstarti + (jobsize / collength + 1) * collength
+                        for i in xrange(head_start_i, head_start_i + job_size):
+                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            cood.append([start_index, cood_list[i][0], cood_list[i][1]])
+                        if job_size % col_length != 0:
+                            for i in xrange(head_start_i + job_size, head_start_i + (job_size / col_length + 1) * col_length):
+                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
+                                cood.append([start_index, cood_list[i][0], cood_list[i][1]])
+                            head_start_i = head_start_i + (job_size / col_length + 1) * col_length
                         else:
-                            headstarti = headstarti + jobsize
-                        endtime = time + currentjob.returnTime()
-                        runningprocess.append({"coodinate": cood, "endtime": endtime})
+                            head_start_i = head_start_i + job_size
+                        end_time = time + current_job.returnTime()
+                        running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:
                         # job cannot be placed in
-                        headstarti = 0
-                        startindex += 1
+                        head_start_i = 0
+                        start_index += 1
 
-                        if startindex == endindex:
-                            headendi = tailendi
+                        if start_index == end_index:
+                            head_end_i = tail_end_i
 
                 else:  # currentjob.returnFlag() == 0
 
-                    requiredspace = jobsize
+                    required_space = job_size
 
-                    if requiredspace <= tailendi - tailstarti + 1:  # job can be placed in
+                    if required_space <= tail_end_i - tail_start_i + 1:  # job can be placed in
                         cood = []
-                        for i in xrange(tailendi - jobsize + 1, tailendi + 1):
-                            self.matrix[endindex, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                            cood.append([endindex, coodlist[i][0], coodlist[i][1]])
-                        tailendi = tailendi - jobsize
-                        endtime = time + currentjob.returnTime()
-                        runningprocess.append({"coodinate": cood, "endtime": endtime})
+                        for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
+                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            cood.append([end_index, cood_list[i][0], cood_list[i][1]])
+                        tail_end_i = tail_end_i - job_size
+                        end_time = time + current_job.returnTime()
+                        running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
                     else:  # job cannot be placed in
-                        tailendi = len(coodlist) - 1
-                        endindex -= 1
+                        tail_end_i = len(cood_list) - 1
+                        end_index -= 1
 
-                        if startindex == endindex:
-                            tailstarti = headstarti
+                        if start_index == end_index:
+                            tail_start_i = head_start_i
 
-            if startindex == endindex:
+            if start_index == end_index:
 
-                if currentjob.returnFlag() == 1:
+                if current_job.returnFlag() == 1:
 
-                    avaspace = (headendi - headstarti + 1) / collength * collength
-                    if jobsize % collength == 0:
-                        requiredspace = jobsize
+                    ava_space = (head_end_i - head_start_i + 1) / col_length * col_length
+                    if job_size % col_length == 0:
+                        required_space = job_size
                     else:
-                        requiredspace = (jobsize / collength + 1) * collength
+                        required_space = (job_size / col_length + 1) * col_length
 
-                    print "avaspace" + str(avaspace)
-                    print "requiredspace" + str(requiredspace)
+                    print "avaspace" + str(ava_space)
+                    print "requiredspace" + str(required_space)
 
-                    if avaspace >= requiredspace:  # job can be put in
+                    if ava_space >= required_space:  # job can be put in
                         cood = []
-                        print "headstarti" + str(tailendi)
-                        print "startindex" + str(startindex)
-                        print "endindex" + str(endindex)
-                        for i in xrange(headstarti, headstarti + jobsize):
-                            self.matrix[startindex, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                            cood.append([startindex, coodlist[i][0], coodlist[i][1]])
-                        if jobsize % collength != 0:
-                            for i in xrange(headstarti + jobsize, headstarti + (jobsize / collength + 1) * collength):
-                                self.matrix[startindex, coodlist[i][0], coodlist[i][1]] = -currentjob.returnId()
-                                cood.append([startindex, coodlist[i][0], coodlist[i][1]])
-                            headstarti = headstarti + (jobsize / collength + 1) * collength
-                            tailstarti = headstarti
+                        print "headstarti" + str(tail_end_i)
+                        print "startindex" + str(start_index)
+                        print "endindex" + str(end_index)
+                        for i in xrange(head_start_i, head_start_i + job_size):
+                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            cood.append([start_index, cood_list[i][0], cood_list[i][1]])
+                        if job_size % col_length != 0:
+                            for i in xrange(head_start_i + job_size, head_start_i + (job_size / col_length + 1) * col_length):
+                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
+                                cood.append([start_index, cood_list[i][0], cood_list[i][1]])
+                            head_start_i = head_start_i + (job_size / col_length + 1) * col_length
+                            tail_start_i = head_start_i
                         else:
-                            headstarti = headstarti + jobsize
-                            tailstarti = headstarti
-                        endtime = time + currentjob.returnTime()
-                        runningprocess.append({"coodinate": cood, "endtime": endtime})
+                            head_start_i = head_start_i + job_size
+                            tail_start_i = head_start_i
+                        end_time = time + current_job.returnTime()
+                        running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:  # job cannot be put in
@@ -206,25 +206,25 @@ class NodeCluster(object):
 
                 else:
 
-                    avaspace = tailendi - tailstarti + 1
-                    print "avaspace" + str(avaspace)
-                    requiredspace = jobsize
-                    print "requiredspace" + str(requiredspace)
+                    ava_space = tail_end_i - tail_start_i + 1
+                    print "avaspace" + str(ava_space)
+                    required_space = job_size
+                    print "requiredspace" + str(required_space)
 
-                    if avaspace >= requiredspace:  # job can be put in
+                    if ava_space >= required_space:  # job can be put in
                         cood = []
-                        print "tailendi" + str(tailendi)
-                        print "startindex" + str(startindex)
-                        print "endindex" + str(endindex)
+                        print "tailendi" + str(tail_end_i)
+                        print "startindex" + str(start_index)
+                        print "endindex" + str(end_index)
 
-                        for i in xrange(tailendi - jobsize + 1, tailendi + 1):
+                        for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
                             print i
-                            self.matrix[endindex, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                            cood.append([endindex, coodlist[i][0], coodlist[i][1]])
-                        tailendi = tailendi - jobsize
-                        headendi = tailendi
-                        endtime = time + currentjob.returnTime()
-                        runningprocess.append({"coodinate": cood, "endtime": endtime})
+                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            cood.append([end_index, cood_list[i][0], cood_list[i][1]])
+                        tail_end_i = tail_end_i - job_size
+                        head_end_i = tail_end_i
+                        end_time = time + current_job.returnTime()
+                        running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:  # job cannot be put in
@@ -237,77 +237,77 @@ class NodeCluster(object):
                         time += 50
                         break
 
-        for each in runningprocess:
+        for each in running_process:
             if each["endtime"] <= time:
                 for cood in each["coodinate"]:
                     self.matrix[cood[0], cood[1], cood[2]] = 0
-                runningprocess.remove(each)
+                running_process.remove(each)
 
         return queue
 
     def insert_to_max_subset(self, queue):
         global time
-        global runningprocess
+        global running_process
         global utilization
 
-        maxmatrixlist = self.get_max_subsets()
-        maxarea = reduce(mul, maxmatrixlist[0]["matrix"][0])
-        index = maxmatrixlist[0]["index"]
-        mat = maxmatrixlist[0][
+        max_matrix_list = self.get_max_subsets()
+        max_area = reduce(mul, max_matrix_list[0]["matrix"][0])
+        index = max_matrix_list[0]["index"]
+        mat = max_matrix_list[0][
             "matrix"]  # mat is in the format : [(rowlength, collength), lastrownum, startcolnum, endcolnumber]
-        startcoodx = mat[1] + 1 - mat[0][0]
-        startcoody = mat[2]
-        endcoodx = mat[1]
-        endcoody = mat[3]
-        rowlength = mat[0][0]
-        collength = mat[0][1]
+        start_cood_x = mat[1] + 1 - mat[0][0]
+        start_cood_y = mat[2]
+        end_cood_x = mat[1]
+        end_cood_y = mat[3]
+        row_length = mat[0][0]
+        col_length = mat[0][1]
 
-        coodlist = []
-        for x in xrange(startcoodx, endcoodx + 1):
-            for y in xrange(startcoody, endcoody + 1):
-                coodlist.append([x, y])
+        cood_list = []
+        for x in xrange(start_cood_x, end_cood_x + 1):
+            for y in xrange(start_cood_y, end_cood_y + 1):
+                cood_list.append([x, y])
 
-        starti = 0
-        endi = len(coodlist) - 1
+        start_i = 0
+        end_i = len(cood_list) - 1
 
         while True:
 
             if len(queue) > 0:
-                currentjob = queue[len(queue) - 1]
+                current_job = queue[len(queue) - 1]
             else:
                 break
-            jobsize = currentjob.returnSize()
+            job_size = current_job.returnSize()
 
-            if jobsize <= endi - starti + 1:
+            if job_size <= end_i - start_i + 1:
 
                 queue.pop()
 
-                if currentjob.returnFlag() == 1:
+                if current_job.returnFlag() == 1:
                     cood = []
-                    for i in xrange(starti, starti + jobsize):
-                        self.matrix[index, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                        cood.append([index, coodlist[i][0], coodlist[i][1]])
-                    if jobsize % collength != 0:
-                        for i in xrange(starti + jobsize, starti + (jobsize / collength + 1) * collength):
-                            self.matrix[index, coodlist[i][0], coodlist[i][1]] = -currentjob.returnId()
-                            cood.append([index, coodlist[i][0], coodlist[i][1]])
-                        starti = starti + (jobsize / collength + 1) * collength
+                    for i in xrange(start_i, start_i + job_size):
+                        self.matrix[index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                        cood.append([index, cood_list[i][0], cood_list[i][1]])
+                    if job_size % col_length != 0:
+                        for i in xrange(start_i + job_size, start_i + (job_size / col_length + 1) * col_length):
+                            self.matrix[index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
+                            cood.append([index, cood_list[i][0], cood_list[i][1]])
+                        start_i = start_i + (job_size / col_length + 1) * col_length
                     else:
-                        starti = starti + jobsize
-                    endtime = time + currentjob.returnTime()
-                    runningprocess.append({"coodinate": cood, "endtime": endtime})
+                        start_i = start_i + job_size
+                    end_time = time + current_job.returnTime()
+                    running_process.append({"coodinate": cood, "endtime": end_time})
 
                 else:
                     cood = []
-                    for i in xrange(endi - jobsize + 1, endi + 1):
-                        self.matrix[index, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
-                        cood.append([index, coodlist[i][0], coodlist[i][1]])
-                    endi = endi - jobsize
-                    endtime = time + currentjob.returnTime()
-                    runningprocess.append({"coodinate": cood, "endtime": endtime})
+                    for i in xrange(end_i - job_size + 1, end_i + 1):
+                        self.matrix[index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                        cood.append([index, cood_list[i][0], cood_list[i][1]])
+                    end_i = end_i - job_size
+                    end_time = time + current_job.returnTime()
+                    running_process.append({"coodinate": cood, "endtime": end_time})
 
             else:
-                if jobsize > reduce(mul, self.get_max_subsets()[0]["matrix"][0]):
+                if job_size > reduce(mul, self.get_max_subsets()[0]["matrix"][0]):
                     print "cant insert anymore"
                     print time
                     # file.write("time: "+str(time)+", jobsize: "+str(jobsize)+", maxsubmatrix: "+str(reduce(mul, self.get_max_subsets()[0]["matrix"][0]))+"\n" )
@@ -319,11 +319,11 @@ class NodeCluster(object):
                     time += 50
                 break
 
-        for each in runningprocess:
+        for each in running_process:
             if each["endtime"] <= time:
                 for cood in each["coodinate"]:
                     self.matrix[cood[0], cood[1], cood[2]] = 0
-                runningprocess.remove(each)
+                running_process.remove(each)
 
         # file.close()
         return queue
@@ -356,7 +356,7 @@ def main():
             f.write('{},{}\n'.format(str(time), str(util)))
 
     print a.get_max_cuboid()
-    print runningprocess
+    print running_process
 
 if __name__ == "__main__":
     main()
