@@ -17,19 +17,19 @@ class NodeCluster(object):
         self.sidenumber = input
         self.matrix = np.zeros((side, side, side))
 
-    def returnMatrix(self):
+    def get_matrix(self):
         """return the matrix"""
         return self.matrix
 
-    def returnValue(self, x, y, z):
+    def get_value(self, x, y, z):
         """return the"""
         return self.matrix[x, y, z]
 
-    def changeValue(self, x, y, z, value):
+    def set_value(self, x, y, z, value):
         """change one point in matrix to be a value we want"""
         self.matrix[x, y, z] = value
 
-    def getMaxCuboid(self):
+    def get_max_cuboid(self):
         """in 3d dimensions to get the largest Cuboid inside"""
         matlist = self.matrix
         maxvol = 0
@@ -42,11 +42,11 @@ class NodeCluster(object):
                     maxvol = reduce(mul, max_size(each)[0]) * level
                     maxarea = max_size(each)
                     maxindex = [index, level]
-            matlist = self.generateOverlappedSet(matlist)
+            matlist = self.generate_overlapped_set(matlist)
             level += 1
         return {"maxvol": maxvol, "maxarea": maxarea, "maxindex": maxindex}
 
-    def generateOverlappedSet(self, mat1):
+    def generate_overlapped_set(self, mat1):
         """get the overlapped matrix by mat1"""
         tempmat = np.zeros((len(mat1) - 1, self.sidenumber, self.sidenumber))
         for i in xrange(len(mat1) - 1):
@@ -57,7 +57,7 @@ class NodeCluster(object):
 
         return tempmat
 
-    def getMaxSubsets(self):
+    def get_max_subsets(self):
         """get the largest subset matrix from each single matrix"""
         maxmatrixlist = []
         for i in xrange(len(self.matrix)):
@@ -66,12 +66,12 @@ class NodeCluster(object):
         maxmatrixlist = sorted(maxmatrixlist, key=lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
         return maxmatrixlist
 
-    def insertToMaxCuboid(self, queue):
+    def insert_to_max_cuboid(self, queue):
         global time
         global runningprocess
         global utilization
 
-        maxcuboid = self.getMaxCuboid()
+        maxcuboid = self.get_max_cuboid()
         startindex = maxcuboid["maxindex"][0]
         endindex = maxcuboid["maxindex"][0] + maxcuboid["maxindex"][1] - 1
 
@@ -197,11 +197,11 @@ class NodeCluster(object):
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        print self.calUtilization()
+                        print self.cal_utilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
-                        utilization.append({"time": time, "util": self.calUtilization()})
+                        utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
 
@@ -230,11 +230,11 @@ class NodeCluster(object):
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        print self.calUtilization()
+                        print self.cal_utilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
-                        utilization.append({"time": time, "util": self.calUtilization()})
+                        utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
 
@@ -246,12 +246,12 @@ class NodeCluster(object):
 
         return queue
 
-    def insertToMaxSubset(self, queue):
+    def insert_to_max_subset(self, queue):
         global time
         global runningprocess
         global utilization
 
-        maxmatrixlist = self.getMaxSubsets()
+        maxmatrixlist = self.get_max_subsets()
         maxarea = reduce(mul, maxmatrixlist[0]["matrix"][0])
         index = maxmatrixlist[0]["index"]
         mat = maxmatrixlist[0][
@@ -308,15 +308,15 @@ class NodeCluster(object):
                     runningprocess.append({"coodinate": cood, "endtime": endtime})
 
             else:
-                if jobsize > reduce(mul, self.getMaxSubsets()[0]["matrix"][0]):
+                if jobsize > reduce(mul, self.get_max_subsets()[0]["matrix"][0]):
                     print "cant insert anymore"
                     print time
-                    # file.write("time: "+str(time)+", jobsize: "+str(jobsize)+", maxsubmatrix: "+str(reduce(mul, self.getMaxSubsets()[0]["matrix"][0]))+"\n" )
+                    # file.write("time: "+str(time)+", jobsize: "+str(jobsize)+", maxsubmatrix: "+str(reduce(mul, self.get_max_subsets()[0]["matrix"][0]))+"\n" )
                     for i in xrange(side):
                         reshapedmatrix = np.asarray(self.matrix[i]).reshape(-1)
                         # file.write(str(reshapedmatrix))
                     # file.write("\n")
-                    utilization.append({"time": time, "util": self.calUtilization()})
+                    utilization.append({"time": time, "util": self.cal_utilization()})
                     time += 50
                 break
 
@@ -329,7 +329,7 @@ class NodeCluster(object):
         # file.close()
         return queue
 
-    def calUtilization(self):
+    def cal_utilization(self):
         count = 0
         for x in xrange(side):
             for y in xrange(side):
@@ -341,13 +341,13 @@ class NodeCluster(object):
 
 
 a = NodeCluster(24)
-print a.calUtilization()
-# print(a.returnValue(2,4,5))
+print a.cal_utilization()
+# print(a.get_value(2,4,5))
 q1 = JobQueue()
 q = q1.QueryGenerate(3)
 
 while len(q) > 0:
-    q = a.insertToMaxCuboid(q)
+    q = a.insert_to_max_cuboid(q)
 
 with open('result0', 'w') as f:
     for each in utilization:
@@ -355,5 +355,5 @@ with open('result0', 'w') as f:
         util = each['util']
         f.write('{},{}\n'.format(str(time), str(util)))
 
-print a.getMaxCuboid()
+print a.get_max_cuboid()
 print runningprocess
