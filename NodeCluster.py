@@ -1,5 +1,5 @@
 import numpy as np
-from MaxRecSize import *
+from MaxRecSize import mul, max_size
 from JobQueue import JobQueue
 
 time = 0
