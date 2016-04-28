@@ -4,14 +4,18 @@ import random
 
 class JobQueue(object):
     def __init__(self, quantity=5000):
-        # quantity is the number of sample jobs in this queue, defaultly it is 5000
-        # list is the job queue that contains all sample jobs
+        """
+        quantity is the number of sample jobs in this queue, defaultly it is 5000
+        list is the job queue that contains all sample jobs
+        """
         self.quantity = quantity
         self.list = []
 
     def generate_query(self, flag=0):
-        # generate quantity number of sample jobs in queue
-        # sizelist was used to generate random size that used to generate sample jobs
+        """
+        generate quantity number of sample jobs in queue
+        sizelist was used to generate random size that used to generate sample jobs
+        """
         sizelist = 3679 * [1]
         my_randoms = [random.choice(xrange(2, 10)) for _ in range(876)]
         sizelist += my_randoms
