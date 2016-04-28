@@ -1,4 +1,4 @@
-from numpy import *
+import numpy as np
 from MaxRecSize import *
 from SampleJob import SampleJob
 from JobQueue import JobQueue
@@ -15,7 +15,7 @@ class NodeCluster(object):
         global side
         side = input
         self.sidenumber = input
-        self.matrix = zeros((side, side, side))
+        self.matrix = np.zeros((side, side, side))
 
     def returnMatrix(self):
         """return the matrix"""
@@ -48,7 +48,7 @@ class NodeCluster(object):
 
     def generateOverlappedSet(self, mat1):
         """get the overlapped matrix by mat1"""
-        tempmat = zeros((len(mat1) - 1, self.sidenumber, self.sidenumber))
+        tempmat = np.zeros((len(mat1) - 1, self.sidenumber, self.sidenumber))
         for i in xrange(len(mat1) - 1):
             for x in xrange(self.sidenumber):
                 for y in xrange(self.sidenumber):
@@ -313,7 +313,7 @@ class NodeCluster(object):
                     print time
                     # file.write("time: "+str(time)+", jobsize: "+str(jobsize)+", maxsubmatrix: "+str(reduce(mul, self.getMaxSubsets()[0]["matrix"][0]))+"\n" )
                     for i in xrange(side):
-                        reshapedmatrix = asarray(self.matrix[i]).reshape(-1)
+                        reshapedmatrix = np.asarray(self.matrix[i]).reshape(-1)
                         # file.write(str(reshapedmatrix))
                     # file.write("\n")
                     utilization.append({"time": time, "util": self.calUtilization()})
