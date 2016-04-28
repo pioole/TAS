@@ -370,12 +370,11 @@ q = q1.QueryGenerate(3)
 while len(q) > 0:
     q = a.insertToMaxCuboid(q)
 
-f = open('result0', 'w')
-for each in utilization:
-    time = each['time']
-    util = each['util']
-    f.write(str(time) + "," + str(util) + '\n')
-f.close()  # you can omit in most cases as the destructor will call it
+with open('result0', 'w') as f:
+    for each in utilization:
+        time = each['time']
+        util = each['util']
+        f.write(str(time) + "," + str(util) + '\n')
 
 print a.getMaxCuboid()
 print runningprocess
