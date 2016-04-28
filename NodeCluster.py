@@ -1,6 +1,5 @@
 import numpy as np
 from MaxRecSize import *
-from SampleJob import SampleJob
 from JobQueue import JobQueue
 
 time = 0
