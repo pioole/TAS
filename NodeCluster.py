@@ -361,30 +361,6 @@ class NodeCluster(object):
         return percentage
 
 
-# a = NodeCluster(24)
-# print a.calUtilization()
-# b = a.generateOverlappedSet(a.matrix)
-# print a.getMaxCuboid()
-# print len(b)
-# print len(b[0])
-# print b
-# q1 = JobQueue()
-# q = q1.QueryGenerate(3)
-
-# while len(q) > 0:
-#    q = a.insertToMaxSubset(q)
-
-# f = open('result0','w')
-# for each in utilization:
-#   time = each['time']
-#   util = each['util']
-#   f.write(str(time)+","+str(util)+'\n') 
-# f.close()
-
-
-# print a.getMaxSubsets()
-# print runningprocess
-
 a = NodeCluster(24)
 print a.calUtilization()
 # print(a.returnValue(2,4,5))
