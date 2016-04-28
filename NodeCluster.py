@@ -12,7 +12,6 @@ utilization = []
 class NodeCluster(object):
     def __init__(self, input):
         # initial a 3d array with all 0 number included
-        # self.matrix = [[[0 for x in range(side)] for x in range(side)] for x in range(side)]
         global side
         side = input
         self.sidenumber = input
@@ -142,13 +141,11 @@ class NodeCluster(object):
                         if startindex == endindex:
                             headendi = tailendi
 
-
                 else:  # currentjob.returnFlag() == 0
 
                     requiredspace = jobsize
 
-                    if requiredspace <= tailendi - tailstarti + 1:
-                        # job can be placed in
+                    if requiredspace <= tailendi - tailstarti + 1:  # job can be placed in
                         cood = []
                         for i in xrange(tailendi - jobsize + 1, tailendi + 1):
                             self.matrix[endindex, coodlist[i][0], coodlist[i][1]] = currentjob.returnId()
@@ -157,8 +154,7 @@ class NodeCluster(object):
                         endtime = time + currentjob.returnTime()
                         runningprocess.append({"coodinate": cood, "endtime": endtime})
                         queue.pop()
-                    else:
-                        # job cannot be placed in
+                    else:  # job cannot be placed in
                         tailendi = len(coodlist) - 1
                         endindex -= 1
 
@@ -200,15 +196,12 @@ class NodeCluster(object):
                         queue.pop()
 
                     else:  # job cannot be put in
-                        # sort runningprocess by endtime from small to large, go to the smallest
                         print "cannot insert More add time"
                         print self.calUtilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
-                        # runningprocess = sorted(runningprocess, key= lambda p: p["endtime"])
                         utilization.append({"time": time, "util": self.calUtilization()})
-                        # time = runningprocess[0]["endtime"]
                         time += 50
                         break
 
@@ -236,15 +229,12 @@ class NodeCluster(object):
                         queue.pop()
 
                     else:  # job cannot be put in
-                        # sort runningprocess by endtime from small to large, go to the smallest
                         print "cannot insert More add time"
                         print self.calUtilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
-                        # runningprocess = sorted(runningprocess, key= lambda p: p["endtime"])
                         utilization.append({"time": time, "util": self.calUtilization()})
-                        # time = runningprocess[0]["endtime"]
                         time += 50
                         break
 
@@ -278,27 +268,16 @@ class NodeCluster(object):
             for y in xrange(startcoody, endcoody + 1):
                 coodlist.append([x, y])
 
-        # print len(coodlist)
         starti = 0
         endi = len(coodlist) - 1
 
-        # file = open("matrix","a")
         while True:
 
             if len(queue) > 0:
                 currentjob = queue[len(queue) - 1]
             else:
                 break
-            # print currentjob
-            # print "id:"+str(currentjob.returnId())
-            # print "flag:"+str(currentjob.returnFlag())
-            # print "size:"+str(currentjob.returnSize())
-            # print "runtime:"+str(currentjob.returnTime())
             jobsize = currentjob.returnSize()
-            # print "endi:"+str(endi)
-            # print "starti:"+str(starti)
-            # print "time:"+str(time)
-
 
             if jobsize <= endi - starti + 1:
 
