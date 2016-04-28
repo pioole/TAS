@@ -340,20 +340,26 @@ class NodeCluster(object):
         return percentage
 
 
-a = NodeCluster(24)
-print a.cal_utilization()
-# print(a.get_value(2,4,5))
-q1 = JobQueue()
-q = q1.QueryGenerate(3)
+def main():
+    a = NodeCluster(24)
+    print a.cal_utilization()
+    # print(a.get_value(2,4,5))
+    q1 = JobQueue()
+    q = q1.QueryGenerate(3)
 
-while len(q) > 0:
-    q = a.insert_to_max_cuboid(q)
+    while len(q) > 0:
+        q = a.insert_to_max_cuboid(q)
 
-with open('result0', 'w') as f:
-    for each in utilization:
-        time = each['time']
-        util = each['util']
-        f.write('{},{}\n'.format(str(time), str(util)))
+    with open('result0', 'w') as f:
+        for each in utilization:
+            time = each['time']
+            util = each['util']
+            f.write('{},{}\n'.format(str(time), str(util)))
 
-print a.get_max_cuboid()
-print runningprocess
+    print a.get_max_cuboid()
+    print runningprocess
+
+if __name__ == "__main__":
+    main()
+
+
