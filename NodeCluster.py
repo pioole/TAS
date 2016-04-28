@@ -2,6 +2,7 @@ from numpy import *
 from MaxRecSize import *
 from SampleJob import SampleJob
 from JobQueue import JobQueue
+import time as t
 
 time = 0
 runningprocess = []
@@ -42,11 +43,12 @@ class NodeCluster(object):
             for index, each in enumerate(matlist):
                 if reduce(mul, max_size(each)[0])*level>maxvol:
                     maxvol = reduce(mul, max_size(each)[0])*level
+                    maxplane = reduce(mul, max_size(each)[0])
                     maxarea = max_size(each)
                     maxindex = [index, level]
             matlist = self.generateOverlappedSet(matlist)
             level+=1
-        return {"maxvol": maxvol, "maxarea":maxarea, "maxindex":maxindex}
+        return {"maxvol": maxvol, "maxarea":maxarea, "maxindex":maxindex, "maxplane":maxplane}
 
 
             
@@ -79,7 +81,7 @@ class NodeCluster(object):
         global time
         global runningprocess
         global utilization
-
+        
         maxcuboid = self.getMaxCuboid()
         startindex = maxcuboid["maxindex"][0]
         endindex = maxcuboid["maxindex"][0] + maxcuboid["maxindex"][1]-1
@@ -173,13 +175,21 @@ class NodeCluster(object):
                         endindex -= 1
 
                         if startindex == endindex:
-                            tailstarti = headstarti
+                            tailstarti = headstarti 
 
             if startindex == endindex:
 
                 if currentjob.returnFlag() == 1:
 
                     avaspace = (headendi - headstarti + 1)/collength * collength
+                    if avaspace == 0:
+                        print self.matrix[startindex]
+                        print "headstarti"+str(headstarti)
+                        print "headendi"+str(headendi)
+                        print "collength" + str(collength)
+                        print "maxcuboid"+str(maxcuboid)
+                        #t.sleep(10)
+
                     if jobsize % collength == 0:
                         requiredspace = jobsize
                     else:
@@ -211,20 +221,35 @@ class NodeCluster(object):
 
                     else: # job cannot be put in
                         # sort runningprocess by endtime from small to large, go to the smallest
-                        print "cannot insert More add time"
+                        print "cannot insert more"
+                        newmaxcuboid = self.getMaxCuboid()
+                        newmaxplane = newmaxcuboid["maxplane"]
+                        print "requiredspace---"+str(requiredspace)
+                        print "newmaxplane"+str(newmaxplane)
+                        if newmaxplane >= requiredspace:
+                            print "get new maxcuboid"
+                            break
                         print self.calUtilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
+                        print "add more time"
                         #runningprocess = sorted(runningprocess, key= lambda p: p["endtime"])
                         utilization.append({"time":time,"util":self.calUtilization()})
                         #time = runningprocess[0]["endtime"]
                         time += 50
                         break
 
-                else:
+                else:# currentjob.returnflag() == 0
 
                     avaspace = tailendi - tailstarti + 1
+                    if avaspace == 0:
+                        print self.matrix[startindex]
+                        print "headstarti"+str(headstarti)
+                        print "headendi"+str(headendi)
+                        print "collength" + str(collength)
+                        print "maxcuboid"+str(maxcuboid)
+                        #t.sleep(10)
                     print "avaspace"+str(avaspace)
                     requiredspace = jobsize
                     print "requiredspace"+str(requiredspace)
@@ -247,11 +272,17 @@ class NodeCluster(object):
 
                     else: # job cannot be put in
                         # sort runningprocess by endtime from small to large, go to the smallest
-                        print "cannot insert More add time"
+                        print "cannot insert More"
+                        newmaxcuboid = self.getMaxCuboid()
+                        newmaxplane = newmaxcuboid["maxplane"]
+                        if newmaxplane >= requiredspace:
+                            print "get new maxcuboid"
+                            break
                         print self.calUtilization()
                         print self.matrix[0]
                         print self.matrix[1]
                         print self.matrix[20]
+                        print "add more time"
                         #runningprocess = sorted(runningprocess, key= lambda p: p["endtime"])
                         utilization.append({"time":time,"util":self.calUtilization()})
                         #time = runningprocess[0]["endtime"]

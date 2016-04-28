@@ -72,7 +72,7 @@ def max_rectangle_size(histogram):
             #print start
             endcolcount = pos  
             #print pos
-    return max_size
+    return (int(max_size[0]),int(max_size[1]))
 
 def area(size):
     return reduce(mul, size)
