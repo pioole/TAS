@@ -58,9 +58,8 @@ class NodeCluster(object):
 
     def get_max_subsets(self):
         """get the largest subset matrix from each single matrix"""
-        max_matrix_list = []
-        for i in xrange(len(self.matrix)):
-            max_matrix_list.append({"index": i, "matrix": max_size(self.matrix[i])})
+        max_matrix_list = [{"index": i, "matrix": max_size(self.matrix[i])}
+                           for i in xrange(len(self.matrix))]
 
         max_matrix_list = sorted(max_matrix_list, key=lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
         return max_matrix_list
