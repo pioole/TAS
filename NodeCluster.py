@@ -71,7 +71,7 @@ class NodeCluster(object):
 
         max_cuboid = self.get_max_cuboid()
         start_index = max_cuboid["maxindex"][0]
-        end_index = max_cuboid["maxindex"][0] + max_cuboid["maxindex"][1] - 1
+        end_index = start_index + max_cuboid["maxindex"][1] - 1
 
         mat = max_cuboid["maxarea"]
         start_cood_x = mat[1] + 1 - mat[0][0]
