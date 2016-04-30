@@ -41,12 +41,8 @@ class JobQueue(object):
         random.shuffle(timelist)
 
         for i in xrange(5000):
-            if flag == 0 or flag == 1:
-                newjob = SampleJob(i + 1, timelist[i], sizelist[i], flag)
-                self.list.append(newjob)
-            else:
-                newjob = SampleJob(i + 1, timelist[i], sizelist[i], random.randint(0, 1))
-                self.list.append(newjob)
+            newjob = SampleJob(i + 1, timelist[i], sizelist[i], flag)
+            self.list.append(newjob)
 
         return self.list
 
