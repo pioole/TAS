@@ -185,7 +185,7 @@ class NodeCluster(object):
                             for i in xrange(head_start_i + job_size, head_start_i + (job_size / col_length + 1) * col_length):
                                 self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
                                 cood.append([start_index, cood_list[i][0], cood_list[i][1]])
-                            head_start_i = head_start_i + (job_size / col_length + 1) * col_length
+                            head_start_i += (job_size / col_length + 1) * col_length
                             tail_start_i = head_start_i
                         else:
                             head_start_i = head_start_i + job_size
@@ -291,7 +291,7 @@ class NodeCluster(object):
                         for i in xrange(start_i + job_size, start_i + (job_size / col_length + 1) * col_length):
                             self.matrix[index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
                             cood.append([index, cood_list[i][0], cood_list[i][1]])
-                        start_i = start_i + (job_size / col_length + 1) * col_length
+                        start_i += (job_size / col_length + 1) * col_length
                     else:
                         start_i = start_i + job_size
                     end_time = time + current_job.returnTime()
