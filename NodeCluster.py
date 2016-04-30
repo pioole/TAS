@@ -310,11 +310,8 @@ class NodeCluster(object):
                 if job_size > reduce(mul, self.get_max_subsets()[0]["matrix"][0]):
                     print "cant insert anymore"
                     print time
-                    # file.write("time: "+str(time)+", jobsize: "+str(jobsize)+", maxsubmatrix: "+str(reduce(mul, self.get_max_subsets()[0]["matrix"][0]))+"\n" )
                     for i in xrange(side):
                         reshapedmatrix = np.asarray(self.matrix[i]).reshape(-1)
-                        # file.write(str(reshapedmatrix))
-                    # file.write("\n")
                     utilization.append({"time": time, "util": self.cal_utilization()})
                     time += 50
                 break
@@ -325,7 +322,6 @@ class NodeCluster(object):
                     self.matrix[cood[0], cood[1], cood[2]] = 0
                 running_process.remove(each)
 
-        # file.close()
         return queue
 
     def cal_utilization(self):
@@ -342,7 +338,6 @@ class NodeCluster(object):
 def main():
     a = NodeCluster(24)
     print a.cal_utilization()
-    # print(a.get_value(2,4,5))
     q1 = JobQueue()
     q = q1.generate_query(3)
 
