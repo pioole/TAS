@@ -40,9 +40,7 @@ class JobQueue(object):
 
         random.shuffle(timelist)
 
-        for i in xrange(5000):
-            newjob = SampleJob(i + 1, timelist[i], sizelist[i], flag)
-            self.list.append(newjob)
+        self.list = [SampleJob(i + 1, timelist[i], sizelist[i], flag) for i in xrange(5000)]
 
         return self.list
 
