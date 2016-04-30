@@ -55,11 +55,8 @@ def max_rectangle_size(histogram):
             elif stack and height < top().height:
                 if max(max_size, (top().height, (pos - top().start)), key=area) == (top().height, (pos - top().start)):
                     max_size = max(max_size, (top().height, (pos - top().start)), key=area)
-                    # print max_size
                     startcolcount = top().start
-                    # print "beforeloopstart"+str(startcolcount)
                     endcolcount = pos
-                    # print "beforeloopend"+str(endcolcount)
                 start, _ = stack.pop()
                 continue
             break  # height == top().height goes here
