@@ -49,17 +49,18 @@ def max_rectangle_size(histogram):
     pos = 0  # current position in the histogram
     for pos, height in enumerate(histogram):
         start = pos  # position where rectangle starts
-        while True:
-            if not stack or height > top().height:
-                stack.append(Info(start, height))  # push
-            elif stack and height < top().height:
+
+        if not stack or height > top().height:
+            stack.append(Info(start, height))  # push
+        else:
+            while stack and height < top().height:
                 if max(max_size, (top().height, (pos - top().start)), key=area) == (top().height, (pos - top().start)):
                     max_size = max(max_size, (top().height, (pos - top().start)), key=area)
                     startcolcount = top().start
                     endcolcount = pos
                 start, _ = stack.pop()
-                continue
-            break  # height == top().height goes here
+            if not stack or height > top().height:  # not sure if needed. Didn't want to change the logic here.
+                stack.append(Info(start, height))  # push
 
     pos += 1
     for start, height in stack:
