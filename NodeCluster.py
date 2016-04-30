@@ -91,13 +91,13 @@ class NodeCluster(object):
 
         tail_start_i = 0
         tail_end_i = len(cood_list) - 1
-        print "tailendi originally = " + str(tail_end_i)
+        print "tailendi originally = {}".format(tail_end_i)
 
         while True:
 
             if len(queue) > 0:
                 current_job = queue[len(queue) - 1]
-                print "length of queue" + str(len(queue))
+                print "length of queue{}".format(len(queue))
             else:
                 print "Queue is empty"
                 break
@@ -169,14 +169,14 @@ class NodeCluster(object):
                     else:
                         required_space = (job_size / col_length + 1) * col_length
 
-                    print "avaspace" + str(ava_space)
-                    print "requiredspace" + str(required_space)
+                    print "avaspace{}".format(ava_space)
+                    print "requiredspace{}".format(required_space)
 
                     if ava_space >= required_space:  # job can be put in
                         cood = []
-                        print "headstarti" + str(tail_end_i)
-                        print "startindex" + str(start_index)
-                        print "endindex" + str(end_index)
+                        print "headstarti{}".format(tail_end_i)
+                        print "startindex{}".format(start_index)
+                        print "endindex{}".format(end_index)
                         for i in xrange(head_start_i, head_start_i + job_size):
                             self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
                             cood.append([start_index, cood_list[i][0], cood_list[i][1]])
@@ -206,15 +206,15 @@ class NodeCluster(object):
                 else:
 
                     ava_space = tail_end_i - tail_start_i + 1
-                    print "avaspace" + str(ava_space)
+                    print "avaspace{}".format(ava_space)
                     required_space = job_size
-                    print "requiredspace" + str(required_space)
+                    print "requiredspace{}".format(required_space)
 
                     if ava_space >= required_space:  # job can be put in
                         cood = []
-                        print "tailendi" + str(tail_end_i)
-                        print "startindex" + str(start_index)
-                        print "endindex" + str(end_index)
+                        print "tailendi{}".format(tail_end_i)
+                        print "startindex{}".format(start_index)
+                        print "endindex{}".format(end_index)
 
                         for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
                             print i
