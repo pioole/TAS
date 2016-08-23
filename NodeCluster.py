@@ -1,6 +1,7 @@
 import numpy as np
 from MaxRecSize import mul, max_size
 from JobQueue import JobQueue
+from plotting import Plotter
 
 time = 0
 running_process = []
@@ -15,6 +16,7 @@ class NodeCluster(object):
         side = input
         self.side_number = input
         self.matrix = np.zeros((side, side, side))
+        self.plotter = Plotter()
 
     def get_matrix(self):
         """return the matrix"""
@@ -195,10 +197,10 @@ class NodeCluster(object):
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        print self.cal_utilization()
-                        print self.matrix[0]
-                        print self.matrix[1]
-                        print self.matrix[20]
+                        self.show_cal_utilization()
+                        # print self.matrix[0]
+                        # print self.matrix[1]
+                        # print self.matrix[20]
                         utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
@@ -217,7 +219,7 @@ class NodeCluster(object):
                         print "endindex{}".format(end_index)
 
                         for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
-                            print i
+                            # print i
                             self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
                             cood.append([end_index, cood_list[i][0], cood_list[i][1]])
                         tail_end_i = tail_end_i - job_size
@@ -228,10 +230,10 @@ class NodeCluster(object):
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        print self.cal_utilization()
-                        print self.matrix[0]
-                        print self.matrix[1]
-                        print self.matrix[20]
+                        self.show_cal_utilization()
+                        # print self.matrix[0]
+                        # print self.matrix[1]
+                        # print self.matrix[20]
                         utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
@@ -333,10 +335,17 @@ class NodeCluster(object):
         percentage = float(count) / float(side * side * side)
         return percentage
 
+    def show_cal_utilization(self):
+        self.plotter.plot(self.cal_utilization())
+        print 'cal utilization: {}'.format(self.cal_utilization())
+
 
 def main():
+
     a = NodeCluster(24)
-    print a.cal_utilization()
+    # print a.cal_utilization()
+
+
     q1 = JobQueue()
     q = q1.generate_query(3)
 
@@ -351,6 +360,7 @@ def main():
 
     print a.get_max_cuboid()
     print running_process
+    a.plotter.preserve_window()
 
 if __name__ == "__main__":
     main()
