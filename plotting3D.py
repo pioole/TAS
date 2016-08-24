@@ -1,22 +1,41 @@
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure, show, draw, cla
 
 
-def randrange(n, vmin, vmax):
-    return (vmax - vmin)*np.random.rand(n) + vmin
+class Plotter3D:
+    def __init__(self):
+        self.fig = figure(2)
+        self.ax = self.fig.add_subplot(111, projection='3d')
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-n = 100
-for c, m, zl, zh in [('r', 'o', 0, 60)]:
-    xs = randrange(n, 23, 32)
-    ys = randrange(n, 0, 100)
-    zs = randrange(n, zl, zh)
-    ax.scatter(xs, ys, zs, c=c, marker=m)
+    def plot(self, xs, ys, zs):
+        figure(2)
+        cla()
+        self.ax.scatter(xs, ys, zs, c='r', marker='o')
 
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
+        self.ax.set_xlabel('X Label')
+        self.ax.set_ylabel('Y Label')
+        self.ax.set_zlabel('Z Label')
 
-plt.show()
+        draw()
+        show(block=False)
+
+    def preserve_window(self):
+        show()
+
+
+#
+# plt = Plotter3D()
+# plt.plot(1, 2, 3)
+# from plotting import Plotter
+# plt1 = Plotter()
+# plt1.plot(1)
+# import time
+# time.sleep(4)
+# plt.plot(4, 5, 6)
+# plt1.plot(3)
+#
+# plt1.preserve_window()
+#
+# plt.preserve_window()
+#

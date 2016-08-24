@@ -2,6 +2,7 @@ import numpy as np
 from MaxRecSize import mul, max_size
 from JobQueue import JobQueue
 from plotting import Plotter
+from plotting3D import Plotter3D
 
 time = 0
 side = 0
@@ -17,6 +18,7 @@ class NodeCluster(object):
         self.utilization = []
         self.running_process = []
         self.plotter = Plotter()
+        self.plotter3D = Plotter3D()
 
     def get_max_cuboid(self):
         """in 3d dimensions to get the largest Cuboid inside"""
@@ -235,9 +237,22 @@ class NodeCluster(object):
     def show_cal_utilization(self):
         self.plotter.plot(self.cal_utilization())
         self.utilization.append({"time": time, "util": self.cal_utilization()})
-        
+
+    def show_3D_plot(self):
+        xs = []
+        ys = []
+        zs = []
+        for each in self.running_process:
+            for cood in each["coodinate"]:
+                xs.append(cood[0])
+                ys.append(cood[1])
+                zs.append(cood[2])
+
+        self.plotter3D.plot(xs, ys, zs)
+
     def run_logger(self):
         self.show_cal_utilization()
+        self.show_3D_plot()
 
 
 def main():
