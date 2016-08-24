@@ -6,7 +6,6 @@ from plotting import Plotter
 time = 0
 running_process = []
 side = 0
-utilization = []
 
 
 class NodeCluster(object):
@@ -16,6 +15,7 @@ class NodeCluster(object):
         side = input
         self.side_number = input
         self.matrix = np.zeros((side, side, side))
+        self.utilization = []
         self.plotter = Plotter()
 
     def get_max_cuboid(self):
@@ -49,7 +49,6 @@ class NodeCluster(object):
     def insert_to_max_cuboid(self, queue):
         global time
         global running_process
-        global utilization
 
         max_cuboid = self.get_max_cuboid()
         start_index = max_cuboid["maxindex"][0]
@@ -181,7 +180,6 @@ class NodeCluster(object):
                         # print self.matrix[0]
                         print self.matrix[1]
                         # print self.matrix[20]
-                        utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
 
@@ -214,7 +212,6 @@ class NodeCluster(object):
                         # print self.matrix[0]
                         print self.matrix[1]
                         # print self.matrix[20]
-                        utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
 
@@ -238,7 +235,7 @@ class NodeCluster(object):
 
     def show_cal_utilization(self):
         self.plotter.plot(self.cal_utilization())
-        print 'cal utilization: {}'.format(self.cal_utilization())
+        self.utilization.append({"time": time, "util": self.cal_utilization()})
 
 
 def main():
@@ -252,7 +249,7 @@ def main():
         q = a.insert_to_max_cuboid(q)
 
     with open('result0', 'w') as f:
-        for each in utilization:
+        for each in a.utilization:
             time = each['time']
             util = each['util']
             f.write('{},{}\n'.format(str(time), str(util)))
