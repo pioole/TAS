@@ -4,7 +4,6 @@ from JobQueue import JobQueue
 from plotting import Plotter
 
 time = 0
-running_process = []
 side = 0
 
 
@@ -16,6 +15,7 @@ class NodeCluster(object):
         self.side_number = input
         self.matrix = np.zeros((side, side, side))
         self.utilization = []
+        self.running_process = []
         self.plotter = Plotter()
 
     def get_max_cuboid(self):
@@ -48,7 +48,6 @@ class NodeCluster(object):
 
     def insert_to_max_cuboid(self, queue):
         global time
-        global running_process
 
         max_cuboid = self.get_max_cuboid()
         start_index = max_cuboid["maxindex"][0]
@@ -109,7 +108,7 @@ class NodeCluster(object):
                         else:
                             head_start_i = head_start_i + job_size
                         end_time = time + current_job.returnTime()
-                        running_process.append({"coodinate": cood, "endtime": end_time})
+                        self.running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:
@@ -131,7 +130,7 @@ class NodeCluster(object):
                             cood.append([end_index, cood_list[i][0], cood_list[i][1]])
                         tail_end_i = tail_end_i - job_size
                         end_time = time + current_job.returnTime()
-                        running_process.append({"coodinate": cood, "endtime": end_time})
+                        self.running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
                     else:  # job cannot be placed in
                         tail_end_i = len(cood_list) - 1
@@ -171,14 +170,14 @@ class NodeCluster(object):
                             head_start_i = head_start_i + job_size
                             tail_start_i = head_start_i
                         end_time = time + current_job.returnTime()
-                        running_process.append({"coodinate": cood, "endtime": end_time})
+                        self.running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        self.show_cal_utilization()
+                        self.run_logger()
                         # print self.matrix[0]
-                        print self.matrix[1]
+                        # print self.matrix[1]
                         # print self.matrix[20]
                         time += 50
                         break
@@ -203,23 +202,23 @@ class NodeCluster(object):
                         tail_end_i = tail_end_i - job_size
                         head_end_i = tail_end_i
                         end_time = time + current_job.returnTime()
-                        running_process.append({"coodinate": cood, "endtime": end_time})
+                        self.running_process.append({"coodinate": cood, "endtime": end_time})
                         queue.pop()
 
                     else:  # job cannot be put in
                         print "cannot insert More add time"
-                        self.show_cal_utilization()
+                        self.run_logger()
                         # print self.matrix[0]
-                        print self.matrix[1]
+                        # print self.matrix[1]
                         # print self.matrix[20]
                         time += 50
                         break
 
-        for each in running_process:
+        for each in self.running_process:
             if each["endtime"] <= time:
                 for cood in each["coodinate"]:
                     self.matrix[cood[0], cood[1], cood[2]] = 0
-                running_process.remove(each)
+                self.running_process.remove(each)
 
         return queue
 
@@ -236,6 +235,9 @@ class NodeCluster(object):
     def show_cal_utilization(self):
         self.plotter.plot(self.cal_utilization())
         self.utilization.append({"time": time, "util": self.cal_utilization()})
+        
+    def run_logger(self):
+        self.show_cal_utilization()
 
 
 def main():
@@ -256,7 +258,7 @@ def main():
 
     # print a.get_max_cuboid()
 
-    # print running_process
+    # print a.running_process
     a.plotter.preserve_window()
 
 if __name__ == "__main__":
