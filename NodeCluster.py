@@ -18,18 +18,6 @@ class NodeCluster(object):
         self.matrix = np.zeros((side, side, side))
         self.plotter = Plotter()
 
-    def get_matrix(self):
-        """return the matrix"""
-        return self.matrix
-
-    def get_value(self, x, y, z):
-        """return the"""
-        return self.matrix[x, y, z]
-
-    def set_value(self, x, y, z, value):
-        """change one point in matrix to be a value we want"""
-        self.matrix[x, y, z] = value
-
     def get_max_cuboid(self):
         """in 3d dimensions to get the largest Cuboid inside"""
         mat_list = self.matrix
@@ -57,14 +45,6 @@ class NodeCluster(object):
                     temp_mat[i, x, y] = val
 
         return temp_mat
-
-    def get_max_subsets(self):
-        """get the largest subset matrix from each single matrix"""
-        max_matrix_list = [{"index": i, "matrix": max_size(self.matrix[i])}
-                           for i in xrange(len(self.matrix))]
-
-        max_matrix_list = sorted(max_matrix_list, key=lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
-        return max_matrix_list
 
     def insert_to_max_cuboid(self, queue):
         global time
@@ -199,7 +179,7 @@ class NodeCluster(object):
                         print "cannot insert More add time"
                         self.show_cal_utilization()
                         # print self.matrix[0]
-                        # print self.matrix[1]
+                        print self.matrix[1]
                         # print self.matrix[20]
                         utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
@@ -232,90 +212,11 @@ class NodeCluster(object):
                         print "cannot insert More add time"
                         self.show_cal_utilization()
                         # print self.matrix[0]
-                        # print self.matrix[1]
+                        print self.matrix[1]
                         # print self.matrix[20]
                         utilization.append({"time": time, "util": self.cal_utilization()})
                         time += 50
                         break
-
-        for each in running_process:
-            if each["endtime"] <= time:
-                for cood in each["coodinate"]:
-                    self.matrix[cood[0], cood[1], cood[2]] = 0
-                running_process.remove(each)
-
-        return queue
-
-    def insert_to_max_subset(self, queue):
-        global time
-        global running_process
-        global utilization
-
-        max_matrix_list = self.get_max_subsets()
-        max_area = reduce(mul, max_matrix_list[0]["matrix"][0])
-        index = max_matrix_list[0]["index"]
-        mat = max_matrix_list[0][
-            "matrix"]  # mat is in the format : [(rowlength, collength), lastrownum, startcolnum, endcolnumber]
-        start_cood_x = mat[1] + 1 - mat[0][0]
-        start_cood_y = mat[2]
-        end_cood_x = mat[1]
-        end_cood_y = mat[3]
-        row_length = mat[0][0]
-        col_length = mat[0][1]
-
-        cood_list = []
-        for x in xrange(start_cood_x, end_cood_x + 1):
-            for y in xrange(start_cood_y, end_cood_y + 1):
-                cood_list.append([x, y])
-
-        start_i = 0
-        end_i = len(cood_list) - 1
-
-        while True:
-
-            if len(queue) > 0:
-                current_job = queue[len(queue) - 1]
-            else:
-                break
-            job_size = current_job.returnSize()
-
-            if job_size <= end_i - start_i + 1:
-
-                queue.pop()
-
-                if current_job.returnFlag() == 1:
-                    cood = []
-                    for i in xrange(start_i, start_i + job_size):
-                        self.matrix[index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
-                        cood.append([index, cood_list[i][0], cood_list[i][1]])
-                    if job_size % col_length != 0:
-                        for i in xrange(start_i + job_size, start_i + (job_size / col_length + 1) * col_length):
-                            self.matrix[index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
-                            cood.append([index, cood_list[i][0], cood_list[i][1]])
-                        start_i += (job_size / col_length + 1) * col_length
-                    else:
-                        start_i = start_i + job_size
-                    end_time = time + current_job.returnTime()
-                    running_process.append({"coodinate": cood, "endtime": end_time})
-
-                else:
-                    cood = []
-                    for i in xrange(end_i - job_size + 1, end_i + 1):
-                        self.matrix[index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
-                        cood.append([index, cood_list[i][0], cood_list[i][1]])
-                    end_i = end_i - job_size
-                    end_time = time + current_job.returnTime()
-                    running_process.append({"coodinate": cood, "endtime": end_time})
-
-            else:
-                if job_size > reduce(mul, self.get_max_subsets()[0]["matrix"][0]):
-                    print "cant insert anymore"
-                    print time
-                    for i in xrange(side):
-                        reshapedmatrix = np.asarray(self.matrix[i]).reshape(-1)
-                    utilization.append({"time": time, "util": self.cal_utilization()})
-                    time += 50
-                break
 
         for each in running_process:
             if each["endtime"] <= time:
@@ -343,8 +244,6 @@ class NodeCluster(object):
 def main():
 
     a = NodeCluster(24)
-    # print a.cal_utilization()
-
 
     q1 = JobQueue()
     q = q1.generate_query(3)
@@ -358,8 +257,9 @@ def main():
             util = each['util']
             f.write('{},{}\n'.format(str(time), str(util)))
 
-    print a.get_max_cuboid()
-    print running_process
+    # print a.get_max_cuboid()
+
+    # print running_process
     a.plotter.preserve_window()
 
 if __name__ == "__main__":
