@@ -239,16 +239,18 @@ class NodeCluster(object):
         self.utilization.append({"time": time, "util": self.cal_utilization()})
 
     def show_3D_plot(self):
-        xs = []
-        ys = []
-        zs = []
+        plot_points = []
         for each in self.running_process:
+            xs = []
+            ys = []
+            zs = []
             for cood in each["coodinate"]:
                 xs.append(cood[0])
                 ys.append(cood[1])
                 zs.append(cood[2])
+            plot_points.append((xs, ys, zs, len(plot_points)))
 
-        self.plotter3D.plot(xs, ys, zs)
+        self.plotter3D.plot(plot_points)
 
     def run_logger(self):
         self.show_cal_utilization()
