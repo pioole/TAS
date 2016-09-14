@@ -70,7 +70,7 @@ def max_rectangle_size(histogram):
             # print start
             endcolcount = pos
             # print pos
-    return max_size
+    return (int(max_size[0]),int(max_size[1]))
 
 
 def area(size):
@@ -78,8 +78,11 @@ def area(size):
 
 
 def main():
-    result = max_size([[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1], [1, 1, 1, 1, 1, 1]])
-    print result[0][2]
+    matrix = [[0, 0, 0],[1, 1, 1],[1, 1, 1]]
+    # matrix = [[0, 0],[1, 1]]
+    # matrix = [[1, 1, 1],[0, 0, 0],[1, 1, 1]]
+    result = max_size(matrix)
+    print result
 
 
 if __name__ == "__main__":
