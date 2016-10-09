@@ -26,16 +26,18 @@ class NodeCluster(object):
         max_vol = 0
         max_area = 0
         max_index = 0
+        max_plane = 0
         level = 1
         while len(mat_list) > 0:
             for index, each in enumerate(mat_list):
                 if reduce(mul, max_size(each)[0]) * level > max_vol:
                     max_vol = reduce(mul, max_size(each)[0]) * level
+                    max_plane = reduce(mul, max_size(each)[0])
                     max_area = max_size(each)
                     max_index = [index, level]
             mat_list = self.generate_overlapped_set(mat_list)
             level += 1
-        return {"maxvol": max_vol, "maxarea": max_area, "maxindex": max_index}
+        return {"maxvol": max_vol, "maxarea": max_area, "maxindex": max_index, "maxplane": max_plane}
 
     def generate_overlapped_set(self, mat1):
         """get the overlapped matrix by mat1"""
@@ -47,6 +49,15 @@ class NodeCluster(object):
                     temp_mat[i, x, y] = val
 
         return temp_mat
+
+    def get_max_subsets(self):
+        """get the largest subset matrix from each single matrix"""
+        max_matrix_list = []
+        for i in xrange(len(self.matrix)):
+            max_matrix_list.append({"index": i, "matrix":max_size(self.matrix[i])})
+
+        max_matrix_list = sorted(max_matrix_list, key= lambda mat: reduce(mul, mat["matrix"][0]), reverse=True)
+        return max_matrix_list
 
     def insert_to_max_cuboid(self, queue):
         global time
@@ -146,6 +157,13 @@ class NodeCluster(object):
                 if current_job.returnFlag() == 1:
 
                     ava_space = (head_end_i - head_start_i + 1) / col_length * col_length
+                    if ava_space == 0:
+                        print self.matrix[start_index]
+                        print "headstarti"+str(head_start_i)
+                        print "headendi"+str(head_end_i)
+                        print "collength" + str(col_length)
+                        print "maxcuboid"+str(max_cuboid)
+                        #t.sleep(10)
                     if job_size % col_length == 0:
                         required_space = job_size
                     else:
@@ -176,15 +194,25 @@ class NodeCluster(object):
                         queue.pop()
 
                     else:  # job cannot be put in
-                        print "cannot insert More add time"
+                        # sort runningprocess by endtime from small to large, go to the smallest
+                        print "cannot insert more"
+
+                        newmaxcuboid = self.get_max_cuboid()
+                        newmaxplane = newmaxcuboid["maxplane"]
+                        print "requiredspace---"+str(required_space)
+                        print "newmaxplane"+str(newmaxplane)
+                        if newmaxplane >= required_space:
+                            print "get new maxcuboid"
+                            break
+                        print self.cal_utilization()
+                        print "add more time"
+                        self.utilization.append({"time": time, "util": self.cal_utilization()})
+
                         self.run_logger()
-                        # print self.matrix[0]
-                        # print self.matrix[1]
-                        # print self.matrix[20]
                         time += 50
                         break
 
-                else:
+                else:  # currentjob.returnflag() == 0
 
                     ava_space = tail_end_i - tail_start_i + 1
                     print "avaspace{}".format(ava_space)
@@ -208,11 +236,15 @@ class NodeCluster(object):
                         queue.pop()
 
                     else:  # job cannot be put in
-                        print "cannot insert More add time"
+                        # sort runningprocess by endtime from small to large, go to the smallest
+                        print "cannot insert more"
+                        newmaxcuboid = self.get_max_cuboid()
+                        newmaxplane = newmaxcuboid["maxplane"]
+                        if newmaxplane >= required_space:
+                            print "get new maxcuboid"
+                            break
+                        self.utilization.append({"time": time, "util": self.cal_utilization()})
                         self.run_logger()
-                        # print self.matrix[0]
-                        # print self.matrix[1]
-                        # print self.matrix[20]
                         time += 50
                         break
 
@@ -280,5 +312,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
