@@ -1,6 +1,6 @@
 TAS project - short version readme.
 
-https://travis-ci.org/pioole/TAS.svg?branch=master
+[![Build Status](https://travis-ci.org/pioole/TAS.svg?branch=master)](https://travis-ci.org/pioole/TAS)
 
 prerequisites:
 
