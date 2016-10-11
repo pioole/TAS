@@ -1,5 +1,7 @@
 TAS project - short version readme.
 
+https://travis-ci.org/pioole/TAS.svg?branch=master
+
 prerequisites:
 
     python2.7.x installed
