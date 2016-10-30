@@ -3,6 +3,7 @@ from MaxRecSize import mul, max_size
 from JobQueue import JobQueue
 from plotting import Plotter
 from plotting3D import Plotter3D
+from src.JobGenerator import JobGenerator
 
 time = 0
 side = 0
@@ -89,17 +90,17 @@ class NodeCluster(object):
         while True:
 
             if len(queue) > 0:
-                current_job = queue[len(queue) - 1]
+                current_job = queue.peek_at_first_job()  # queue[len(queue) - 1]
                 print "length of queue{}".format(len(queue))
             else:
                 print "Queue is empty"
                 break
 
-            job_size = current_job.returnSize()
+            job_size = current_job.nodes_needed
 
             if start_index < end_index:
 
-                if current_job.returnFlag() == 1:
+                if current_job.comm_sensitive == 1:
 
                     # start to check if we can place the job into the matrix
                     if job_size % col_length != 0:
@@ -111,18 +112,18 @@ class NodeCluster(object):
                         # job can be placed in
                         cood = []
                         for i in xrange(head_start_i, head_start_i + job_size):
-                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.job_id
                             cood.append([start_index, cood_list[i][0], cood_list[i][1]])
                         if job_size % col_length != 0:
                             for i in xrange(head_start_i + job_size, head_start_i + (job_size / col_length + 1) * col_length):
-                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
+                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.job_id
                                 cood.append([start_index, cood_list[i][0], cood_list[i][1]])
                             head_start_i = head_start_i + (job_size / col_length + 1) * col_length
                         else:
                             head_start_i = head_start_i + job_size
-                        end_time = time + current_job.returnTime()
+                        end_time = time + current_job.work_time
                         self.running_process.append({"coodinate": cood, "endtime": end_time})
-                        queue.pop()
+                        queue.pop_first()
 
                     else:
                         # job cannot be placed in
@@ -139,12 +140,12 @@ class NodeCluster(object):
                     if required_space <= tail_end_i - tail_start_i + 1:  # job can be placed in
                         cood = []
                         for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
-                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.job_id
                             cood.append([end_index, cood_list[i][0], cood_list[i][1]])
                         tail_end_i = tail_end_i - job_size
-                        end_time = time + current_job.returnTime()
+                        end_time = time + current_job.work_time
                         self.running_process.append({"coodinate": cood, "endtime": end_time})
-                        queue.pop()
+                        queue.pop_first()
                     else:  # job cannot be placed in
                         tail_end_i = len(cood_list) - 1
                         end_index -= 1
@@ -154,7 +155,7 @@ class NodeCluster(object):
 
             if start_index == end_index:
 
-                if current_job.returnFlag() == 1:
+                if current_job.comm_sensitive == 1:
 
                     ava_space = (head_end_i - head_start_i + 1) / col_length * col_length
                     if ava_space == 0:
@@ -178,20 +179,20 @@ class NodeCluster(object):
                         print "startindex{}".format(start_index)
                         print "endindex{}".format(end_index)
                         for i in xrange(head_start_i, head_start_i + job_size):
-                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = current_job.job_id
                             cood.append([start_index, cood_list[i][0], cood_list[i][1]])
                         if job_size % col_length != 0:
                             for i in xrange(head_start_i + job_size, head_start_i + (job_size / col_length + 1) * col_length):
-                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.returnId()
+                                self.matrix[start_index, cood_list[i][0], cood_list[i][1]] = -current_job.job_id
                                 cood.append([start_index, cood_list[i][0], cood_list[i][1]])
                             head_start_i += (job_size / col_length + 1) * col_length
                             tail_start_i = head_start_i
                         else:
                             head_start_i = head_start_i + job_size
                             tail_start_i = head_start_i
-                        end_time = time + current_job.returnTime()
+                        end_time = time + current_job.work_time
                         self.running_process.append({"coodinate": cood, "endtime": end_time})
-                        queue.pop()
+                        queue.pop_first()
 
                     else:  # job cannot be put in
                         # sort runningprocess by endtime from small to large, go to the smallest
@@ -227,13 +228,13 @@ class NodeCluster(object):
 
                         for i in xrange(tail_end_i - job_size + 1, tail_end_i + 1):
                             # print i
-                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.returnId()
+                            self.matrix[end_index, cood_list[i][0], cood_list[i][1]] = current_job.job_id
                             cood.append([end_index, cood_list[i][0], cood_list[i][1]])
                         tail_end_i = tail_end_i - job_size
                         head_end_i = tail_end_i
-                        end_time = time + current_job.returnTime()
+                        end_time = time + current_job.work_time
                         self.running_process.append({"coodinate": cood, "endtime": end_time})
-                        queue.pop()
+                        queue.pop_first()
 
                     else:  # job cannot be put in
                         # sort runningprocess by endtime from small to large, go to the smallest
@@ -293,11 +294,12 @@ def main():
 
     a = NodeCluster(24)
 
-    q1 = JobQueue()
-    q = q1.generate_query(3)
+    queue = JobQueue()
+    job_generator = JobGenerator()
+    queue.fill_queue_with_jobs(job_generator.draw_jobs(4999))
 
-    while len(q) > 0:
-        q = a.insert_to_max_cuboid(q)
+    while len(queue) > 0:
+        queue = a.insert_to_max_cuboid(queue)
 
     with open('result0', 'w') as f:
         for each in a.utilization:

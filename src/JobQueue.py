@@ -1,56 +1,34 @@
-from SampleJob import SampleJob
-import random
 
 
 class JobQueue(object):
-    def __init__(self, quantity=5000):
+    def __init__(self):
         """
-        quantity is the number of sample jobs in this queue, defaultly it is 5000
-        list is the job queue that contains all sample jobs
+        initiates empty job list.
+        :return: None
         """
-        self.quantity = quantity
-        self.list = []
+        self.job_list = []
 
-    def generate_query(self, flag=0):
+    def fill_queue_with_jobs(self, job_list):
         """
-        generate quantity number of sample jobs in queue
-        sizelist was used to generate random size that used to generate sample jobs
+        extends actual job queue with the given list of jobs
+        :param job_list: [Job]
+        :return: None
         """
-        sizelist = 3679 * [1]
-        my_randoms = [random.choice(xrange(2, 10)) for _ in range(876)]
-        sizelist += my_randoms
-        my_randoms = [random.choice(xrange(10, 50)) for _ in range(273)]
-        sizelist += my_randoms
-        my_randoms = [random.choice(xrange(50, 101)) for _ in range(172)]
-        sizelist += my_randoms
-        random.shuffle(sizelist)
+        self.job_list.extend(job_list)
 
-        # timelist was used to generate random time that used to generate sample jobs
-        timelist = []
-        range_list = [(1, 61, 2407), (61, 121, 465), (121, 181, 93), (181, 241, 84), (241, 301, 190), (301, 361, 123),
-                      (361, 421, 75), (421, 481, 61), (481, 541, 90), (541, 601, 93), (601, 661, 68), (661, 721, 50),
-                      (721, 781, 47), (781, 841, 33), (841, 901, 50), (901, 961, 37), (961, 1021, 68),
-                      (1021, 1081, 106), (1081, 1141, 131), (1141, 1201, 107), (1201, 1261, 85), (1261, 1321, 109),
-                      (1321, 1381, 104), (1381, 1441, 324)
-                      ]
+    def pop_first(self):
+        """
+        Returns the first job from the queue and removes it from queue.
+        :return: Job
+        """
+        return self.job_list.pop(0)
 
-        for range_input in range_list:
-            my_randoms = [random.choice(xrange(range_input[0], range_input[1])) for _ in range(range_input[2])]
-            timelist += my_randoms
+    def peek_at_first_job(self):
+        """
+        Returns the first job from the queue without removing it.
+        :return: Job
+        """
+        return self.job_list[0]
 
-        random.shuffle(timelist)
-
-        self.list = [SampleJob(i + 1, timelist[i], sizelist[i], flag) for i in xrange(5000)]
-
-        return self.list
-
-    def pop(self):
-        return self.list.pop()
-
-
-def main():
-    q1 = JobQueue()
-
-if __name__ == "__main__":
-    main()
-
+    def __len__(self):
+        return len(self.job_list)
