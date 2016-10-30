@@ -1,89 +1,62 @@
 from collections import namedtuple
-from operator import mul
-
-Info = namedtuple('Info', 'start height')
-
-startcolcount = 0
-endcolcount = 0
 
 
-def max_size(mat, value=0):
-    """Find height, width of the largest rectangle containing all `value`'s."""
-    global startcolcount
-    global endcolcount
-    it = iter(mat)
-    hist = [(el == value) for el in next(it, [])]
-    # print hist
-    max_size = max_rectangle_size(hist)
-    # print max_size
-    rowcount = 0
-    max_at_row = 0
-    max_at_col_start = 0
-    max_at_col_end = 0
-    for row in it:
-        rowcount += 1
-        hist = [(1 + h) if el == value else 0 for h, el in zip(hist, row)]
-        # print "hist:"+str(hist)
-        # print max_size
-        # print max_rectangle_size(hist)
-
-        if max(max_size, max_rectangle_size(hist), key=area) == max_rectangle_size(hist):
-            # print "it"
-            max_size = max(max_size, max_rectangle_size(hist), key=area)
-            max_at_row = rowcount
-            max_at_col_start = startcolcount
-            max_at_col_end = endcolcount
-
-    return [max_size, max_at_row, max_at_col_start, max_at_col_end - 1]
+Point = namedtuple('Point', 'x y')
+Rectangle = namedtuple('Rectangle', 'top_left_point height width')
+Histogram = namedtuple('Histogram', 'value_list depth')
 
 
-def max_rectangle_size(histogram):
-    """Find height, width of the largest rectangle that fits entirely under
-    the histogram.
-    """
-    global startcolcount
-    global endcolcount
-    stack = []
-    top = lambda: stack[-1]
-    max_size = (0, 0)  # height, width of the largest rectangle
-    pos = 0  # current position in the histogram
-    for pos, height in enumerate(histogram):
-        start = pos  # position where rectangle starts
-
-        if not stack or height > top().height:
-            stack.append(Info(start, height))  # push
-        else:
-            while stack and height < top().height:
-                if max(max_size, (top().height, (pos - top().start)), key=area) == (top().height, (pos - top().start)):
-                    max_size = max(max_size, (top().height, (pos - top().start)), key=area)
-                    startcolcount = top().start
-                    endcolcount = pos
-                start, _ = stack.pop()
-            if not stack or height > top().height:  # not sure if needed. Didn't want to change the logic here.
-                stack.append(Info(start, height))  # push
-
-    pos += 1
-    for start, height in stack:
-        if max(max_size, (height, (pos - start)), key=area) == (height, (pos - start)):
-            max_size = max(max_size, (height, (pos - start)), key=area)
-            startcolcount = start
-            # print start
-            endcolcount = pos
-            # print pos
-    return int(max_size[0]), int(max_size[1])
+def max_size(matrix, empty_value=0):
+    max_rectangle = find_biggest_rectangle(matrix, empty_value)
+    return [(max_rectangle.height, max_rectangle.width), max_rectangle.top_left_point.y + max_rectangle.height - 1, max_rectangle.top_left_point.x, max_rectangle.top_left_point.x + max_rectangle.width -1]
 
 
-def area(size):
-    return reduce(mul, size)
+def find_biggest_rectangle(matrix, empty_value=0):
+
+    histograms = []
+
+    matrix_height = len(matrix)
+    matrix_width = len(matrix[0])
+
+    for depth in xrange(matrix_height):
+
+        histogram = [0] * matrix_width
+
+        for row_num in reversed(xrange(depth, matrix_height)):
+            for col_num in xrange(matrix_width):
+
+                if matrix[row_num][col_num] == empty_value:
+                    histogram[col_num] += 1
+                else:
+                    histogram[col_num] = 0
+
+        histograms.append(Histogram(histogram, depth))
+
+    rectangles = []
+    for histogram in histograms:
+        rectangle = max_rectangle_size(histogram.value_list, histogram.depth)
+        rectangles.append(rectangle)
+
+    return max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
 
 
-def main():
-    matrix = [[0, 0, 0],[1, 1, 1],[1, 1, 1]]
-    # matrix = [[0, 0],[1, 1]]
-    # matrix = [[1, 1, 1],[0, 0, 0],[1, 1, 1]]
-    result = max_size(matrix)
-    print result
+def max_rectangle_size(histogram, depth):
+    indices = []
+    for area_length in xrange(0, len(histogram)):
+        for start_index in xrange(len(histogram)-area_length):
+            indices.append((start_index, start_index + area_length))
 
+    rectangles = []
 
-if __name__ == "__main__":
-    main()
+    for hist_part in indices:
+        h1 = histogram[hist_part[0]]
+        h2 = histogram[hist_part[1]]
+        w = hist_part[1] - hist_part[0] + 1
+
+        rectangles.append(Rectangle(Point(hist_part[0], depth), h1, 1))
+        rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
+        rectangles.append(Rectangle(Point(hist_part[0], depth), min(h1, h2), w))
+
+    max_rectangle = max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
+    return max_rectangle
+

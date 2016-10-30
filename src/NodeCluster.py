@@ -1,5 +1,6 @@
 import numpy as np
-from MaxRecSize import mul, max_size
+from MaxRecSize import max_size
+from operator import mul
 from JobQueue import JobQueue
 from plotting import Plotter
 from plotting3D import Plotter3D
@@ -31,10 +32,11 @@ class NodeCluster(object):
         level = 1
         while len(mat_list) > 0:
             for index, each in enumerate(mat_list):
-                if reduce(mul, max_size(each)[0]) * level > max_vol:
-                    max_vol = reduce(mul, max_size(each)[0]) * level
-                    max_plane = reduce(mul, max_size(each)[0])
-                    max_area = max_size(each)
+                found_max_size = max_size(each)
+                if reduce(mul, found_max_size[0]) * level > max_vol:
+                    max_vol = reduce(mul, found_max_size[0]) * level
+                    max_plane = reduce(mul, found_max_size[0])
+                    max_area = found_max_size
                     max_index = [index, level]
             mat_list = self.generate_overlapped_set(mat_list)
             level += 1
