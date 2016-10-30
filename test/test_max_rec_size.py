@@ -1,6 +1,6 @@
 import unittest
 
-from src.MaxRecSize import max_size, max_rectangle_size
+from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point
 
 
 class TestMaxSize(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestMaxSize(unittest.TestCase):
         self.assertEqual(max_size([[1, 1, 1], [0, 0, 0], [1, 1, 1]]), [(1, 3), 1, 0, 2])
 
     def test_max_size_2(self):
-        self.assertEqual(max_size([[0, 0, 0], [1, 1, 1], [1, 1, 1]]), [(1, 3), 0, 0, -1])
+        self.assertEqual(max_size([[0, 0, 0], [1, 1, 1], [1, 1, 1]]), [(1, 3), 0, 0, 2])
 
     def test_max_size_3(self):
         self.assertEqual(max_size([[0, 0, 0], [0, 0, 0], [1, 1, 1]]), [(2, 3), 1, 0, 2])
@@ -17,12 +17,12 @@ class TestMaxSize(unittest.TestCase):
         self.assertEqual(max_size([[0, 0, 0], [1, 0, 0], [1, 1, 1]]), [(2, 2), 1, 1, 2])
 
     def test_max_size_5(self):
-        self.assertEqual(max_size([[0, 0], [1, 1]]), [(1, 2), 0, 0, -1])
+        self.assertEqual(max_size([[0, 0], [1, 1]]), [(1, 2), 0, 0, 1])
 
 
 class TestMaxRectangleSize(unittest.TestCase):
     def test_max_rectangle_size_1(self):
-        self.assertEqual(max_rectangle_size([1, 2, 6, 6, 3, 2], 0), (2, 6))
+        self.assertEqual(max_rectangle_size([1, 2, 6, 6, 3, 2], 0), Rectangle(top_left_point=Point(x=2, y=0), height=6, width=2))
 
 
 if __name__ == '__main__':
