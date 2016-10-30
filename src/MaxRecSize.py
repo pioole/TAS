@@ -12,7 +12,11 @@ def max_size(matrix, empty_value=0):
 
 
 def find_biggest_rectangle(matrix, empty_value=0):
+    rectangles = find_all_rectangles(matrix, empty_value)
+    return max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
 
+
+def find_all_rectangles(matrix, empty_value=0):
     histograms = []
 
     matrix_height = len(matrix)
@@ -34,13 +38,18 @@ def find_biggest_rectangle(matrix, empty_value=0):
 
     rectangles = []
     for histogram in histograms:
-        rectangle = max_rectangle_size(histogram.value_list, histogram.depth)
-        rectangles.append(rectangle)
+        rectangle_list = get_available_rectangles(histogram.value_list, histogram.depth)
+        rectangles.extend(rectangle_list)
 
-    return max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
+    return rectangles
 
 
 def max_rectangle_size(histogram, depth):
+    rectangles = get_available_rectangles(histogram, depth)
+    return max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
+
+
+def get_available_rectangles(histogram, depth):
     indices = []
     for area_length in xrange(0, len(histogram)):
         for start_index in xrange(len(histogram)-area_length):
@@ -57,6 +66,4 @@ def max_rectangle_size(histogram, depth):
         rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
         rectangles.append(Rectangle(Point(hist_part[0], depth), min(h1, h2), w))
 
-    max_rectangle = max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
-    return max_rectangle
-
+    return rectangles
