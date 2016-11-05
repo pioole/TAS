@@ -2,15 +2,17 @@ import unittest
 
 from src.JobQueue import JobQueue
 from src.Job import Job
+from src.Timer import Timer
 
 
 class TestJobQueue(unittest.TestCase):
     def setUp(self):
         self.queue = JobQueue()
-        self.job1 = Job(1, 12, 32, 1)
-        self.job2 = Job(2, 12, 32, 1)
-        self.job3 = Job(3, 12, 32, 1)
-        self.job4 = Job(4, 12, 32, 1)
+        self.timer = Timer()
+        self.job1 = Job(1, 12, 32, 1, self.timer)
+        self.job2 = Job(2, 12, 32, 1, self.timer)
+        self.job3 = Job(3, 12, 32, 1, self.timer)
+        self.job4 = Job(4, 12, 32, 1, self.timer)
         self.queue.fill_queue_with_jobs([self.job1, self.job2, self.job3, self.job4])
 
     def test_job_queue_1(self):
