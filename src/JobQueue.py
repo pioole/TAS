@@ -8,6 +8,9 @@ class JobQueue(object):
         """
         self.job_list = []
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     def fill_queue_with_jobs(self, job_list):
         """
         extends actual job queue with the given list of jobs
