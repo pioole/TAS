@@ -18,9 +18,7 @@ class BinFinder(object):
 
         while bin_found:
             try:
-                print 'searching for bin..'
                 new_bin = self.get_biggest_bin_in_matrix(node_matrix_mutable)
-                print 'found: {}'.format(new_bin)
                 bin_list.append(new_bin)
                 BinFinder.mark_space_as_used(node_matrix_mutable, new_bin)
             except NoBinsAvailableException:
