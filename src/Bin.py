@@ -1,4 +1,7 @@
+import copy
+
 from geometry_utils import Point3D
+from src.Exceptions import BinTooSmallException
 
 
 class Bin(object):
@@ -14,9 +17,20 @@ class Bin(object):
         self.size_x = size_x
         self.size_y = size_y
         self.size_z = size_z
+        self.space_left = self.get_size()
+        self._zigzag_marker = copy.copy(self.anchor_point)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return self.anchor_point == other.anchor_point and self.size_x == other.size_x and self.size_y == other.size_y and self.size_z == other.size_z
+
+    def __cmp__(self, other):
+        return self.__eq__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.__repr__())
 
     def __str__(self):
         return 'Bin: anchor point: {}, size_x: {}, size_y: {}, size_z: {}'.format(self.anchor_point,
@@ -49,6 +63,69 @@ class Bin(object):
 
         return point_nodes
 
-    def fill_in(self, job_queue):
-        pass  # TODO
+    def fill_in(self, job_queue, cluster):
+        """
+        puts the first job from the list into the cluster
+        :raises BinTooSmallException: when the job is too big
+        :param job_queue: JobQueue
+        :return: None
+        """
+        print 'FILLING BIN: {} size: {}'.format(self, self.get_size())
+        while True:
+            next_job = job_queue.peek_at_first_job()
+            job_size = next_job.nodes_needed
+            if job_size > self.space_left:
+                print 'NO SPACE LEFT: job size: {}, space left: {}, job id: {}'.format(job_size, self.space_left, next_job.job_id)
+                raise BinTooSmallException
+            strategy = self._get_filling_strategy(next_job)
+            strategy(next_job, cluster)
+            job_queue.pop_first()
 
+    def _move_zig_zag_marker(self):
+        if self._zigzag_marker.x >= self.anchor_point.x + self.size_x - 1:  # already at the border along x axis
+                                                                            # will try to move along z axis
+            self._zigzag_marker = Point3D(self.anchor_point.x,  # need to return caret along x axis
+                                          self._zigzag_marker.y,
+                                          self._zigzag_marker.z)
+            if self._zigzag_marker.z >= self.anchor_point.z + self.size_z - 1:  # already at the border along z axis
+                                                                                # will try to move along y axis
+                self._zigzag_marker = Point3D(self._zigzag_marker.x,  # need to return caret along z axis
+                                              self._zigzag_marker.y,
+                                              self.anchor_point.z)
+                if self._zigzag_marker.y >= self.anchor_point.y + self.size_y - 1:  # already at the border along y axis
+                    print 'MARKER EXCEEDED'                                         # nowhere to move..
+                    raise BinTooSmallException
+                else:
+                    self._zigzag_marker = Point3D(self._zigzag_marker.x,
+                                                  self._zigzag_marker.y + 1,  # can be moved.
+                                                  self._zigzag_marker.z)
+            else:
+                self._zigzag_marker = Point3D(self._zigzag_marker.x,
+                                              self._zigzag_marker.y,
+                                              self._zigzag_marker.z + 1)  # can be moved.
+        else:
+            self._zigzag_marker = Point3D(self._zigzag_marker.x + 1,  # can be moved.
+                                          self._zigzag_marker.y,
+                                          self._zigzag_marker.z)
+
+    def _get_filling_strategy(self, job_to_fill):
+        """
+        chooses the right strategy for the given job, and runs it.
+        :return: None
+        """
+        if job_to_fill.comm_sensitive:
+            return self._zig_zag_strategy
+        else:
+            return self._cuboid_strategy
+
+    def _zig_zag_strategy(self, job, cluster):
+        node_list = []
+        for nodes_needed in xrange(job.nodes_needed):
+            node_list.append(copy.copy(self._zigzag_marker))
+            self.space_left -= 1
+            self._move_zig_zag_marker()
+
+        job.posess_nodes(node_list)
+
+    def _cuboid_strategy(self, job):
+        pass
