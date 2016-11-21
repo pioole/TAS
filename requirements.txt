@@ -1,3 +1,4 @@
 argparse==1.2.1
 numpy==1.11.2
 wsgiref==0.1.2
+matplotlib==1.5.3
