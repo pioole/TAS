@@ -18,7 +18,9 @@ class BinFinder(object):
 
         while bin_found:
             try:
+                print 'searching for bin..'
                 new_bin = self.get_biggest_bin_in_matrix(node_matrix_mutable)
+                print 'found: {}'.format(new_bin)
                 bin_list.append(new_bin)
                 BinFinder.mark_space_as_used(node_matrix_mutable, new_bin)
             except NoBinsAvailableException:
@@ -36,7 +38,7 @@ class BinFinder(object):
         """
         used_nodes = bin_.generate_point_nodes()
         for node in used_nodes:
-            matrix[node.z][node.x][node.y] = 1
+                matrix[node.x][node.y][node.z] = 1
 
     def get_biggest_bin_in_matrix(self, matrix):
         """
@@ -64,10 +66,10 @@ class BinFinder(object):
         """
         combined_layer = self.combine_layers(bottom_layer, top_layer, matrix)
         biggest_rectangle = find_biggest_rectangle(combined_layer)
-        anchor_point = Point3D(biggest_rectangle.top_left_point.x,
+        anchor_point = Point3D(bottom_layer,
                                biggest_rectangle.top_left_point.y,
-                               bottom_layer)
-        biggest_bin = Bin(anchor_point, biggest_rectangle.height, biggest_rectangle.width, top_layer - bottom_layer + 1)
+                               biggest_rectangle.top_left_point.x)
+        biggest_bin = Bin(anchor_point, top_layer - bottom_layer + 1, biggest_rectangle.height, biggest_rectangle.width)
         return biggest_bin
 
     def combine_layers(self, bottom_layer, top_layer, matrix):

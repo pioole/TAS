@@ -65,7 +65,7 @@ class TestGetBiggestBinBetweenLayers(unittest.TestCase):
                             [1, 0, 1],
                             [1, 1, 1]]])
 
-        desired_output = Bin(Point3D(1, 1, 0), 1, 1, 3)
+        desired_output = Bin(Point3D(0, 1, 1), 3, 1, 1)
 
         output_ = bin_finder.get_biggest_bin_between_layers(0, 2, input_)
 
@@ -84,7 +84,7 @@ class TestGetBiggestBinBetweenLayers(unittest.TestCase):
                             [1, 0, 1],
                             [1, 1, 1]]])
 
-        desired_output = Bin(Point3D(0, 0, 1), 3, 3, 1)
+        desired_output = Bin(Point3D(1, 0, 0), 1, 3, 3)
 
         output_ = bin_finder.get_biggest_bin_between_layers(1, 1, input_)
 
@@ -105,7 +105,7 @@ class TestGetBiggestBinInMatrix(unittest.TestCase):
                             [1, 0, 1],
                             [1, 1, 1]]])
 
-        desired_output = Bin(Point3D(0, 0, 1), 3, 3, 1)
+        desired_output = Bin(Point3D(1, 0, 0), 1, 3, 3)
 
         output_ = bin_finder.get_biggest_bin_in_matrix(input_)
 
@@ -128,7 +128,7 @@ class TestGetBiggestBinInMatrix(unittest.TestCase):
 
 
 class TestGetAvailableBins(unittest.TestCase):
-    def test_get_available_bins(self):
+    def test_get_available_bins_1(self):
         bin_finder = BinFinder(3)
 
         input_ = np.array([[[1, 1, 1],
@@ -143,9 +143,31 @@ class TestGetAvailableBins(unittest.TestCase):
 
         output_ = bin_finder.get_available_bins(input_)
 
-        desired_output = [Bin(Point3D(x=0, y=0, z=1), 3, 3, 1),
-                          Bin(Point3D(x=1, y=1, z=0), 1, 1, 1),
-                          Bin(Point3D(x=1, y=1, z=2), 1, 1, 1)]
+        desired_output = [Bin(Point3D(x=1, y=0, z=0), 1, 3, 3),
+                          Bin(Point3D(x=0, y=1, z=1), 1, 1, 1),
+                          Bin(Point3D(x=2, y=1, z=1), 1, 1, 1)]
 
         self.assertEqual(output_, desired_output)
+
+    def test_get_available_bins_2(self):
+        bin_finder = BinFinder(3)
+
+        input_ = np.array([[[1, 1, 0],
+                            [1, 0, 1],
+                            [1, 1, 1]],
+                           [[0, 0, 0],
+                            [0, 0, 0],
+                            [0, 0, 0]],
+                           [[1, 1, 1],
+                            [1, 0, 1],
+                            [1, 1, 1]]])
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        desired_output = [Bin(Point3D(x=1, y=0, z=0), 1, 3, 3),
+                          Bin(Point3D(x=2, y=1, z=1), 1, 1, 1),
+                          Bin(Point3D(x=0, y=1, z=1), 1, 1, 1),
+                          Bin(Point3D(x=0, y=0, z=2), 1, 1, 1)]
+
+        self.assertEqual(set(output_), set(desired_output))
 
