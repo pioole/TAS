@@ -44,14 +44,16 @@ job_time_data = [
 
 
 class JobGenerator(object):
-    def __init__(self, timer, buffer_size=5000):
+    def __init__(self, timer, cluster, buffer_size=5000):
         """
         initiates a JobGenerator object with given buffer size.
         :param timer: Timer
+        :param cluster: Cluster
         :param buffer_size: Int
         :return: JobGenerator
         """
         self.timer = timer
+        self.cluster = cluster
         self.available_jobs = []
         self.generate_job_batch()
 
@@ -91,7 +93,7 @@ class JobGenerator(object):
         shuffle(node_data)
         shuffle(time_data)
 
-        job_batch = [Job(job_id, time.time_needed, node.no_of_nodes, 0, self.timer) for time, node, job_id in
+        job_batch = [Job(job_id, time.time_needed, node.no_of_nodes, 1, self.timer, self.cluster) for time, node, job_id in
                      zip(time_data, node_data, xrange(1, 1 + len(time_data)))]
 
         self.available_jobs.extend(job_batch)

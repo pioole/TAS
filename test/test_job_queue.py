@@ -1,18 +1,21 @@
 import unittest
 
+from src.Cluster import Cluster
 from src.JobQueue import JobQueue
 from src.Job import Job
 from src.Timer import Timer
+from src.geometry_utils import Point3D
 
 
 class TestJobQueue(unittest.TestCase):
     def setUp(self):
         self.queue = JobQueue()
         self.timer = Timer()
-        self.job1 = Job(1, 12, 32, 1, self.timer)
-        self.job2 = Job(2, 12, 32, 1, self.timer)
-        self.job3 = Job(3, 12, 32, 1, self.timer)
-        self.job4 = Job(4, 12, 32, 1, self.timer)
+        self.cluster = Cluster(Point3D(24, 24, 24))
+        self.job1 = Job(1, 12, 32, 1, self.timer, self.cluster)
+        self.job2 = Job(2, 12, 32, 1, self.timer, self.cluster)
+        self.job3 = Job(3, 12, 32, 1, self.timer, self.cluster)
+        self.job4 = Job(4, 12, 32, 1, self.timer, self.cluster)
         self.queue.fill_queue_with_jobs([self.job1, self.job2, self.job3, self.job4])
 
     def test_job_queue_1(self):
