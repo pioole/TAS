@@ -8,7 +8,7 @@ from src.Exceptions import NoBinsAvailableException, BinTooSmallException, UnAut
 
 
 class Cluster(object):
-    def __init__(self, cluster_size):
+    def __init__(self, cluster_size, plotting=False):
         """
         initiates the computing cluster simulation object
         :param cluster_size: Point3D
@@ -18,8 +18,9 @@ class Cluster(object):
         self.job_queue = JobQueue()
         self.available_bins = []
         self._node_matrix = np.zeros((self.cluster_size.x, self.cluster_size.y, self.cluster_size.z))
-        self.queue_size_plotter = Plotter()
-        self.plotter3D = Plotter3D()
+        if plotting:
+            self.queue_size_plotter = Plotter()
+            self.plotter3D = Plotter3D()
         self.running_jobs = []
         self.bin_finder = BinFinder(self.cluster_size.x)
 

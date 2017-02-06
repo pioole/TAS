@@ -10,7 +10,7 @@ def main():
 
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
-    cluster = Cluster(cluster_size)
+    cluster = Cluster(cluster_size, plotting=True)
 
     timer = Timer()
 
