@@ -11,6 +11,11 @@ class BinFinder(object):
         self.cluster_side_length = cluster_side_length
 
     def get_available_bins(self, node_matrix):
+        """
+        returns the list of all (non colliding) bins available in given matrix. Sorted descending by size.
+        :param node_matrix: 3d np array
+        :return: [Bin]
+        """
         node_matrix_mutable = np.copy(node_matrix)
 
         bin_found = True
