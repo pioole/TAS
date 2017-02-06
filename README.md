@@ -11,5 +11,5 @@ prerequisites:
 
 running:
 
-    $ python NodeCluster.py
+    $ python Simulation.py
 
