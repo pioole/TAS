@@ -8,6 +8,11 @@ from src.geometry_utils import Point3D
 
 class BinFinder(object):
     def __init__(self, cluster_side_length):
+        """
+        creates a new BinFinder with cluster of equal sizes according to all axis (cube).
+        :param cluster_side_length:  Int
+        :return: BinFinder
+        """
         self.cluster_side_length = cluster_side_length
 
     def get_available_bins(self, node_matrix):
