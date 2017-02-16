@@ -60,10 +60,11 @@ def get_available_rectangles(histogram, depth):
     for hist_part in indices:
         h1 = histogram[hist_part[0]]
         h2 = histogram[hist_part[1]]
+        common_min = min([histogram[x] for x in xrange(hist_part[0], hist_part[1] + 1)])
         w = hist_part[1] - hist_part[0] + 1
 
         rectangles.append(Rectangle(Point(hist_part[0], depth), h1, 1))
         rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
-        rectangles.append(Rectangle(Point(hist_part[0], depth), min(h1, h2), w))
+        rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
 
     return rectangles
