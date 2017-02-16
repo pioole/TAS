@@ -1,6 +1,6 @@
 import unittest
 
-from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle
+from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle, get_available_rectangles
 
 
 class TestMaxSize(unittest.TestCase):
@@ -29,6 +29,13 @@ class TestFindBiggestRectangle(unittest.TestCase):
     def test_find_biggest_rectangle_1(self):
         matrix = [[9, 0, 0, 0, 0, 19, 19, 19, 19, 20, 31, 31, 31, 31, 0, 34, 34, 37, 46, 46, 46, 53]]
         self.assertEqual(find_biggest_rectangle(matrix), Rectangle(top_left_point=Point(x=1, y=0), height=1, width=4))
+
+
+class TestGetAvailableRectangles(unittest.TestCase):
+    def test_get_available_rectangles_1(self):
+        histogram = [2, 1, 2]
+        rectangles = get_available_rectangles(histogram, 0)
+        self.assertEqual(max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width), Rectangle(top_left_point=Point(x=0, y=0), height=1, width=3))
 
 
 if __name__ == '__main__':
