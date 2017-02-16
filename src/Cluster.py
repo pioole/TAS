@@ -89,6 +89,7 @@ class Cluster(object):
                 job.free_nodes()
                 to_remove.append(job)
         no_of_jobs_removed = len(to_remove)
+        logging.debug('jobs removed: {}'.format(to_remove))
         self.running_jobs = list(set(self.running_jobs) - set(to_remove))
         return no_of_jobs_removed
 
@@ -103,6 +104,11 @@ class Cluster(object):
             if self._node_matrix[node.x][node.y][node.z] == 0:
                 self._node_matrix[node.x][node.y][node.z] = job_id
             else:
+                logging.error('job {} tried to overwrite job {} at {} {} {}'.format(job_id,
+                                                                                    self._node_matrix[node.x][node.y][node.z],
+                                                                                    node.x,
+                                                                                    node.y,
+                                                                                    node.z))
                 raise UnAuthorisedAccessException()
         self.running_jobs.append(job)
         job.start_job()
