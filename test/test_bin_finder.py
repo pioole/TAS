@@ -9,7 +9,7 @@ from src.geometry_utils import Point3D
 
 class TestCombineLayers(unittest.TestCase):
     def test_combine_layers_1(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -30,7 +30,7 @@ class TestCombineLayers(unittest.TestCase):
         self.assertTrue(np.array_equal(desired_output, output_))
 
     def test_combine_layers_2(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -53,7 +53,7 @@ class TestCombineLayers(unittest.TestCase):
 
 class TestGetBiggestBinBetweenLayers(unittest.TestCase):
     def test_get_biggest_bin_between_layers_1(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -72,7 +72,7 @@ class TestGetBiggestBinBetweenLayers(unittest.TestCase):
         self.assertEqual(desired_output, output_)
 
     def test_get_biggest_bin_between_layers_2(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -93,7 +93,7 @@ class TestGetBiggestBinBetweenLayers(unittest.TestCase):
 
 class TestGetBiggestBinInMatrix(unittest.TestCase):
     def test_get_biggest_bin_in_matrix_1(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -112,7 +112,7 @@ class TestGetBiggestBinInMatrix(unittest.TestCase):
         self.assertEqual(desired_output, output_)
 
     def test_get_biggest_bin_in_matrix_2(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 1, 1],
@@ -129,7 +129,7 @@ class TestGetBiggestBinInMatrix(unittest.TestCase):
 
 class TestGetAvailableBins(unittest.TestCase):
     def test_get_available_bins_1(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 1],
                             [1, 0, 1],
@@ -150,7 +150,7 @@ class TestGetAvailableBins(unittest.TestCase):
         self.assertEqual(output_, desired_output)
 
     def test_get_available_bins_2(self):
-        bin_finder = BinFinder(3)
+        bin_finder = BinFinder(3, minimal_bin_size=0)
 
         input_ = np.array([[[1, 1, 0],
                             [1, 0, 1],

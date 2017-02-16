@@ -8,14 +8,18 @@ from src.geometry_utils import Point3D
 from performance import perf
 
 
+MINIMAL_BIN_SIZE = 60
+
+
 class BinFinder(object):
-    def __init__(self, cluster_side_length):
+    def __init__(self, cluster_side_length, minimal_bin_size=MINIMAL_BIN_SIZE):
         """
         creates a new BinFinder with cluster of equal sizes according to all axis (cube).
         :param cluster_side_length:  Int
         :return: BinFinder
         """
         self.cluster_side_length = cluster_side_length
+        self.minimal_bin_size = minimal_bin_size
 
     @perf
     def get_available_bins(self, node_matrix):
@@ -33,7 +37,7 @@ class BinFinder(object):
             try:
                 new_bin = self.get_biggest_bin_in_matrix(node_matrix_mutable)
                 logging.debug(new_bin)
-                if new_bin.get_size() <= 60:
+                if new_bin.get_size() <= self.minimal_bin_size:
                     raise NoBinsAvailableException
                 bin_list.append(new_bin)
                 BinFinder.mark_space_as_used(node_matrix_mutable, new_bin)
