@@ -1,13 +1,17 @@
+import logging
+
 from src.JobGenerator import JobGenerator
 from src.Cluster import Cluster
 from src.Timer import Timer
 from src.geometry_utils import Point3D
 
 CLUSTER_SIDE_LENGTH = 24
+LOGGING_LEVEL = logging.DEBUG
 
 
 def main():
 
+    logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
     cluster = Cluster(cluster_size, plotting=True)
@@ -21,7 +25,7 @@ def main():
     while cluster.work_to_do():
         cluster.run_time_tick()
         timer.tick()
-        print 'TIME: {}'.format(timer.time())
+        logging.info('TIME: {}'.format(timer.time()))
 
     cluster.queue_size_plotter.preserve_window()
 
