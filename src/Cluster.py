@@ -89,7 +89,6 @@ class Cluster(object):
                 job.free_nodes()
                 to_remove.append(job)
         no_of_jobs_removed = len(to_remove)
-        logging.debug('jobs removed: {}'.format(to_remove))
         self.running_jobs = list(set(self.running_jobs) - set(to_remove))
         return no_of_jobs_removed
 
