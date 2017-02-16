@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 from src.Bin import Bin
 from src.Exceptions import NoBinsAvailableException
@@ -31,6 +32,9 @@ class BinFinder(object):
         while bin_found:
             try:
                 new_bin = self.get_biggest_bin_in_matrix(node_matrix_mutable)
+                logging.debug(new_bin)
+                if new_bin.get_size() <= 60:
+                    raise NoBinsAvailableException
                 bin_list.append(new_bin)
                 BinFinder.mark_space_as_used(node_matrix_mutable, new_bin)
             except NoBinsAvailableException:
