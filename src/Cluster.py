@@ -1,10 +1,12 @@
 import numpy as np
+import logging
 
 from JobQueue import JobQueue
 from plotting import Plotter
 from plotting3D import Plotter3D
 from src.BinFinder import BinFinder
 from src.Exceptions import NoBinsAvailableException, BinTooSmallException, UnAuthorisedAccessException
+from performance import perf
 
 
 class Cluster(object):
@@ -24,6 +26,7 @@ class Cluster(object):
         self.running_jobs = []
         self.bin_finder = BinFinder(self.cluster_size.x)
 
+    @perf
     def update_job_queue(self, job_list, plot=True):
         """
         fills clusters job queue with new list of given jobs.
@@ -36,6 +39,7 @@ class Cluster(object):
         if plot:
             self.queue_size_plotter.plot(len(self.job_queue))
 
+    @perf
     def _update_available_bins_list(self):
         """
         Finds all available bins and puts them into available_bins list.
@@ -61,6 +65,7 @@ class Cluster(object):
         except ValueError:
             raise NoBinsAvailableException()
 
+    @perf
     def _fill_available_bins(self):
         filling_in = True
         while filling_in:
@@ -71,6 +76,7 @@ class Cluster(object):
             except (NoBinsAvailableException, BinTooSmallException):
                 filling_in = False
 
+    @perf
     def _remove_finished_jobs(self):
         """
         removes completed job from the cluster, and running_jobs list
