@@ -4,6 +4,7 @@ from src.Bin import Bin
 from src.Exceptions import NoBinsAvailableException
 from src.MaxRecSize import find_biggest_rectangle
 from src.geometry_utils import Point3D
+from performance import perf
 
 
 class BinFinder(object):
@@ -15,6 +16,7 @@ class BinFinder(object):
         """
         self.cluster_side_length = cluster_side_length
 
+    @perf
     def get_available_bins(self, node_matrix):
         """
         returns the list of all (non colliding) bins available in given matrix. Sorted descending by size.
@@ -37,6 +39,7 @@ class BinFinder(object):
         return bin_list
 
     @staticmethod
+    @perf
     def mark_space_as_used(matrix, bin_):
         """
         fills the space taken by the given bin in given matrix (in situ)
@@ -48,6 +51,7 @@ class BinFinder(object):
         for node in used_nodes:
                 matrix[node.x][node.y][node.z] = 1
 
+    @perf
     def get_biggest_bin_in_matrix(self, matrix):
         """
         returns the biggest bin available in given matrix
