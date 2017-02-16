@@ -147,13 +147,13 @@ class Cluster(object):
         the job queue is empty.
         :return:
         """
-        print '#########################'
+        logging.info('### New Time Tick #########################')
         no_of_jobs_removed = self._remove_finished_jobs()
-        print '{} jobs removed after last iteration'.format(no_of_jobs_removed)
+        logging.info('{} jobs removed after last iteration'.format(no_of_jobs_removed))
         self._update_available_bins_list()
-        print '{} BIN(S) AVAILABLE'.format(len(self.available_bins))
+        logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
         self._fill_available_bins()
-        print '{} JOB(S) RUNNING'.format(len(self.running_jobs))
+        logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
         self.queue_size_plotter.plot(len(self.job_queue))
         self.plot_3D()
 
