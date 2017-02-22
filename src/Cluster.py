@@ -23,6 +23,7 @@ class Cluster(object):
         if plotting:
             self.queue_size_plotter = Plotter(1)
             self.plotter3D = Plotter3D(2)
+            self.cluster_utilization_plotter = Plotter(3)
         self.running_jobs = []
         self.bin_finder = BinFinder(self.cluster_size.x)
 
@@ -146,6 +147,15 @@ class Cluster(object):
 
         self.plotter3D.plot(plot_points)
 
+    @perf
+    def count_cluster_utilization(self):
+        """
+        returns current fraction of cluster utilization
+        :return: Float
+        """
+        logging.debug('non-zero values in matrix: {}'.format(np.count_nonzero(self._node_matrix)))
+        return 1. * np.count_nonzero(self._node_matrix) / self._node_matrix.size
+
     def run_time_tick(self):
         """
         runs one iteration of the packing algorithm. The iteration stops if there is no more space in cluster or if
@@ -159,6 +169,11 @@ class Cluster(object):
         logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
         self._fill_available_bins()
         logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
-        self.queue_size_plotter.plot(len(self.job_queue))
+        cluster_utilization = self.count_cluster_utilization()
+        logging.info('Current cluster utilization: {}'.format(cluster_utilization))
+        job_queue_size = len(self.job_queue)
+        logging.info('Current queue size: {}'.format(job_queue_size))
+        self.cluster_utilization_plotter.plot(cluster_utilization)
+        self.queue_size_plotter.plot(job_queue_size)
         self.plot_3D()
 
