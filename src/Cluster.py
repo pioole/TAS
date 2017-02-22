@@ -134,6 +134,10 @@ class Cluster(object):
         return bool(self.job_queue.job_list)
 
     def plot_3D(self):
+        """
+        creates a plot of all currently running jobs in order to visualize them
+        :return: None
+        """
         plot_points = []
         for job in self.running_jobs:
             xs = []
