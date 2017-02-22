@@ -68,6 +68,10 @@ class Cluster(object):
 
     @perf
     def _fill_available_bins(self):
+        """
+        fills bins from self.available_bins with jobs from self.job_queue
+        :return: None
+        """
         filling_in = True
         while filling_in:
             try:
