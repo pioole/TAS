@@ -171,3 +171,45 @@ class TestGetAvailableBins(unittest.TestCase):
 
         self.assertEqual(set(output_), set(desired_output))
 
+
+class TestOverlappingBinCleaner(unittest.TestCase):
+    def test_overlapping_bin_cleaner(self):
+        bin_list = [Bin(Point3D(x=0, y=0, z=0), 1, 2, 2),
+                    Bin(Point3D(x=0, y=0, z=1), 1, 2, 1),
+                    Bin(Point3D(x=0, y=0, z=1), 1, 22, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
+                    ]
+
+        self.assertEqual(BinFinder.overlapping_bin_cleaner(bin_list), [Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)])
+
+
+class TestBinsCollide(unittest.TestCase):
+    def test_bins_collide(self):
+        bin1 = Bin(Point3D(x=0, y=0, z=0), 1, 2, 2)
+        bin2 = Bin(Point3D(x=0, y=0, z=1), 1, 2, 1)
+
+        self.assertTrue(BinFinder.bins_collide(bin1, bin2))
+
+    def test_bins_collide_2(self):
+        bin1 = Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
+        bin2 = Bin(Point3D(x=0, y=0, z=1), 1, 22, 24)
+
+        self.assertTrue(BinFinder.bins_collide(bin2, bin1))
+
+    def test_bins_collide_3(self):
+        bin1 = Bin(Point3D(x=0, y=0, z=0), 24, 24, 1)
+        bin2 = Bin(Point3D(x=0, y=0, z=1), 24, 24, 1)
+
+        self.assertFalse(BinFinder.bins_collide(bin1, bin2))
+
+    def test_bins_collide_4(self):
+        bin1 = Bin(Point3D(x=0, y=0, z=1), 1, 2, 1)
+        bin2 = Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
+
+        self.assertTrue(BinFinder.bins_collide(bin1, bin2))
+
+    def test_bins_collide_5(self):
+        bin1 = Bin(Point3D(x=0, y=0, z=1), 1, 2, 1)
+        bin2 = Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
+
+        self.assertTrue(BinFinder.bins_collide(bin2, bin1))

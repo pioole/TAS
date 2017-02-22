@@ -104,3 +104,30 @@ class BinFinder(object):
         layer_list = np.split(matrix, self.cluster_side_length)
         layers_to_combine = layer_list[bottom_layer:top_layer + 1]
         return np.sum(layers_to_combine, axis=0)[0]
+
+    @staticmethod
+    def overlapping_bin_cleaner(bin_list):
+        """
+        gets a list of bins and returns a list of biggest non-colliding bins.
+        :param bin_list: [Bin]
+        :return: [Bin]
+        """
+        biggest_bins = []
+        while len(bin_list) > 0:
+            biggest_bin = max(bin_list, key=lambda bin_: bin_.get_size())
+            bin_list = filter(lambda bin_: not BinFinder.bins_collide(biggest_bin, bin_), bin_list)
+            biggest_bins.append(biggest_bin)
+        return biggest_bins
+
+    @staticmethod
+    def bins_collide(bin1, bin2):
+        """
+        returns information if two given bins collide with each other.
+        :param bin1: Bin
+        :param bin2: Bin
+        :return: Boolean
+        """
+        nodes_1 = bin1.generate_point_nodes()
+        nodes_2 = bin2.generate_point_nodes()
+        return not set(nodes_1).isdisjoint(nodes_2)
+
