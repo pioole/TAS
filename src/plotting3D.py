@@ -15,12 +15,13 @@ colour_map = {
 
 
 class Plotter3D:
-    def __init__(self):
-        self.fig = figure(2)
+    def __init__(self, figure_num):
+        self.fig = figure(figure_num)
         self.ax = self.fig.add_subplot(111, projection='3d')
+        self.figure_num = figure_num
 
     def plot(self, plot_points):
-        figure(2)
+        figure(self.figure_num)
         cla()
         for plot_group in plot_points:
             xs, ys, zs, colour_seed = plot_group

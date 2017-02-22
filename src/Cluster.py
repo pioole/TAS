@@ -21,8 +21,8 @@ class Cluster(object):
         self.available_bins = []
         self._node_matrix = np.zeros((self.cluster_size.x, self.cluster_size.y, self.cluster_size.z))
         if plotting:
-            self.queue_size_plotter = Plotter()
-            self.plotter3D = Plotter3D()
+            self.queue_size_plotter = Plotter(1)
+            self.plotter3D = Plotter3D(2)
         self.running_jobs = []
         self.bin_finder = BinFinder(self.cluster_size.x)
 
