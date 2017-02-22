@@ -17,6 +17,12 @@ def find_biggest_rectangle(matrix, empty_value=0):
 
 
 def find_all_rectangles(matrix, empty_value=0):
+    """
+    returns biggest available non-colliding rectangles from given matrix
+    :param matrix: np array
+    :param empty_value: Int
+    :return: [Rectangle]
+    """
     histograms = []
 
     matrix_height = len(matrix)
@@ -41,7 +47,7 @@ def find_all_rectangles(matrix, empty_value=0):
         rectangle_list = get_available_rectangles(histogram.value_list, histogram.depth)
         rectangles.extend(rectangle_list)
 
-    return rectangles
+    return overlapping_rectangle_cleaner(rectangles)
 
 
 def max_rectangle_size(histogram, depth):
@@ -50,6 +56,12 @@ def max_rectangle_size(histogram, depth):
 
 
 def get_available_rectangles(histogram, depth):
+    """
+    returns biggest available non-colliding rectangles from given histogram
+    :param histogram: Histogram
+    :param depth: Int
+    :return: [Rectangle]
+    """
     indices = []
     for area_length in xrange(0, len(histogram)):
         for start_index in xrange(len(histogram)-area_length):
@@ -63,8 +75,35 @@ def get_available_rectangles(histogram, depth):
         common_min = min([histogram[x] for x in xrange(hist_part[0], hist_part[1] + 1)])
         w = hist_part[1] - hist_part[0] + 1
 
-        rectangles.append(Rectangle(Point(hist_part[0], depth), h1, 1))
-        rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
-        rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
+        if h1 > 0:
+            rectangles.append(Rectangle(Point(hist_part[0], depth), h1, 1))
+        if h2 > 0:
+            rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
+        if common_min > 0 and w > 0:
+            rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
 
-    return rectangles
+    return overlapping_rectangle_cleaner(rectangles)
+
+
+def overlapping_rectangle_cleaner(rectangle_list):
+    biggest_rectangles = []
+    while len(rectangle_list) > 0:
+        biggest_rectangle = max(rectangle_list, key=lambda rect: rect.width * rect.height)
+        rectangle_list = filter(lambda rect: not rectangles_collide(biggest_rectangle, rect), rectangle_list)
+        biggest_rectangles.append(biggest_rectangle)
+    return biggest_rectangles
+
+
+def rectangles_collide(rect1, rect2):
+    rect1_top_left = rect1.top_left_point
+    rect1_top_right = Point(rect1.top_left_point.x + rect1.width - 1, rect1.top_left_point.y)
+    rect1_bottom_left = Point(rect1.top_left_point.x, rect1.top_left_point.y + rect1.height - 1)
+    rect1_bottom_right = Point(rect1.top_left_point.x + rect1.width - 1, rect1.top_left_point.y + rect1.height - 1)
+
+    rect1_vertices_list = [rect1_top_left, rect1_top_right, rect1_bottom_left, rect1_bottom_right]
+
+    for vertex in rect1_vertices_list:
+        if rect2.top_left_point.x <= vertex.x <= rect2.top_left_point.x + rect2.width - 1 and \
+           rect2.top_left_point.y <= vertex.y <= rect2.top_left_point.y + rect2.height - 1:
+            return True
+    return False

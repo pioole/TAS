@@ -1,6 +1,6 @@
 import unittest
 
-from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle, get_available_rectangles
+from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle, get_available_rectangles, rectangles_collide
 
 
 class TestMaxSize(unittest.TestCase):
@@ -37,6 +37,27 @@ class TestGetAvailableRectangles(unittest.TestCase):
         rectangles = get_available_rectangles(histogram, 0)
         self.assertEqual(max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width), Rectangle(top_left_point=Point(x=0, y=0), height=1, width=3))
 
+
+class TestRectanglesCollide(unittest.TestCase):
+    def test_rectangles_collide_1(self):
+        rect1 = Rectangle(Point(0, 0), 2, 2)
+        rect2 = Rectangle(Point(1, 1), 1, 1)
+        self.assertTrue(rectangles_collide(rect1, rect2))
+
+    def test_rectangles_collide_2(self):
+        rect1 = Rectangle(Point(0, 0), 2, 2)
+        rect2 = Rectangle(Point(2, 2), 1, 1)
+        self.assertFalse(rectangles_collide(rect1, rect2))
+
+    def test_rectangles_collide_3(self):
+        rect1 = Rectangle(Point(1, 1), 1, 1)
+        rect2 = Rectangle(Point(0, 0), 1, 1)
+        self.assertFalse(rectangles_collide(rect1, rect2))
+
+    def test_rectangles_collide_4(self):
+        rect1 = Rectangle(Point(0, 0), 2, 2)
+        rect2 = Rectangle(Point(1, 1), 1, 1)
+        self.assertTrue(rectangles_collide(rect2, rect1))
 
 if __name__ == '__main__':
     unittest.main()
