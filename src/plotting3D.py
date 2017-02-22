@@ -39,18 +39,3 @@ class Plotter3D:
         show()
 
 
-#
-# plt = Plotter3D()
-# plt.plot(1, 2, 3)
-# from plotting import Plotter
-# plt1 = Plotter()
-# plt1.plot(1)
-# import time
-# time.sleep(4)
-# plt.plot(4, 5, 6)
-# plt1.plot(3)
-#
-# plt1.preserve_window()
-#
-# plt.preserve_window()
-#
