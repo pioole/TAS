@@ -1,4 +1,5 @@
 import copy
+import logging
 
 from geometry_utils import Point3D
 from src.Exceptions import BinTooSmallException
@@ -70,12 +71,11 @@ class Bin(object):
         :param job_queue: JobQueue
         :return: None
         """
-        print 'FILLING BIN: {} size: {}'.format(self, self.get_size())
+        logging.info('FILLING BIN: {} size: {}'.format(self, self.get_size()))
         while True:
             next_job = job_queue.peek_at_first_job()
             job_size = next_job.nodes_needed
             if job_size > self.space_left:
-                print 'NO SPACE LEFT: job size: {}, space left: {}, job id: {}'.format(job_size, self.space_left, next_job.job_id)
                 raise BinTooSmallException
             strategy = self._get_filling_strategy(next_job)
             strategy(next_job, cluster)
@@ -93,7 +93,6 @@ class Bin(object):
                                               self._zigzag_marker.y,
                                               self.anchor_point.z)
                 if self._zigzag_marker.y >= self.anchor_point.y + self.size_y - 1:  # already at the border along y axis
-                    print 'MARKER EXCEEDED'                                         # nowhere to move..
                     raise BinTooSmallException
                 else:
                     self._zigzag_marker = Point3D(self._zigzag_marker.x,
