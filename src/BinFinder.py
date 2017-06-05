@@ -30,8 +30,9 @@ class BinFinder(object):
         """
         node_matrix_mutable = np.copy(node_matrix)
 
-        bin_list = self.get_biggest_bins_in_matrix(node_matrix_mutable)
-        bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list)
+        bin_list_unfiltered = self.get_biggest_bins_in_matrix(node_matrix_mutable)
+        bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list_unfiltered)
+        logging.info('No of bins found: {}, above minimal size: {}'.format(len(bin_list_unfiltered), len(bin_list)))
 
         return bin_list
 

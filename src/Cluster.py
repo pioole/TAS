@@ -10,7 +10,7 @@ from performance import perf
 
 
 class Cluster(object):
-    def __init__(self, cluster_size, plotting=False):
+    def __init__(self, cluster_size, plotting=False, minimal_bin_size=1):
         """
         initiates the computing cluster simulation object
         :param cluster_size: Point3D
@@ -25,7 +25,7 @@ class Cluster(object):
             self.plotter3D = Plotter3D(2)
             self.cluster_utilization_plotter = Plotter(3)
         self.running_jobs = []
-        self.bin_finder = BinFinder(self.cluster_size.x)
+        self.bin_finder = BinFinder(self.cluster_size.x, minimal_bin_size)
 
     @perf
     def update_job_queue(self, job_list, plot=True):

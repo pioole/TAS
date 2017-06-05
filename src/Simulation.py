@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 
 from src.JobGenerator import JobGenerator
 from src.Cluster import Cluster
@@ -9,12 +10,13 @@ CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.DEBUG
 
 
-def main():
+def main(minimal_bin_size):
+    ITERATIONS = 20
 
     logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
-    cluster = Cluster(cluster_size, plotting=True)
+    cluster = Cluster(cluster_size, plotting=True, minimal_bin_size=minimal_bin_size)
 
     timer = Timer()
 
@@ -22,12 +24,22 @@ def main():
 
     cluster.update_job_queue(job_generator.draw_jobs(5000))
 
-    while cluster.work_to_do():
+    utilizations = []
+
+    while cluster.work_to_do() and ITERATIONS > 0:
         cluster.run_time_tick()
+        utilizations.append(cluster.count_cluster_utilization())
         timer.tick()
         logging.info('TIME: {}'.format(timer.time()))
+        ITERATIONS -= 1
 
-    cluster.queue_size_plotter.preserve_window()
+    logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {}'.format(utilizations, minimal_bin_size))
+    logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} '.format(np.mean(utilizations), minimal_bin_size))
+
+    # cluster.queue_size_plotter.preserve_window()
 
 if __name__ == "__main__":
-    main()
+    logging.basicConfig(level=LOGGING_LEVEL)
+    for x in xrange(1, 24*24, 10):
+        logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'.format(x))
+        main(x)
