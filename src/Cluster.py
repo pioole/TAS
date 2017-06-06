@@ -54,6 +54,7 @@ class Cluster(object):
         :param bin_: Bin
         :return: None
         """
+        logging.info('removing bin: {}'.format(bin_))
         self.available_bins.remove(bin_)
 
     def _get_biggest_available_bin(self):
@@ -62,6 +63,7 @@ class Cluster(object):
         :return: Bin
         """
         try:
+            logging.info('max bin: {}'.format(max(self.available_bins, key=lambda bin_: bin_.get_size())))
             return max(self.available_bins, key=lambda bin_: bin_.get_size())
         except ValueError:
             raise NoBinsAvailableException()
@@ -76,9 +78,11 @@ class Cluster(object):
         while filling_in:
             try:
                 bin_ = self._get_biggest_available_bin()
-                bin_.fill_in(self.job_queue, self)
                 self._mark_bin_as_used(bin_)
-            except (NoBinsAvailableException, BinTooSmallException):
+                bin_.fill_in(self.job_queue, self)
+            except BinTooSmallException:
+                pass
+            except NoBinsAvailableException:
                 filling_in = False
 
     @perf
