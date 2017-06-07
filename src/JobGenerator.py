@@ -1,12 +1,16 @@
+import os
 from collections import namedtuple
 from random import shuffle, randint
 
+from src.Exceptions import NoMoreStaticDataException
 from src.Job import Job
 
 JobNodeCharacteristics = namedtuple('JobNodeCharacteristics', 'amount bottom_no_of_nodes top_no_of_jobs')
 JobTimeCharacteristics = namedtuple('JobTimeCharacteristics', 'minimal_time maximal_time amount')
 JobNodeData = namedtuple('JobNodeData', 'no_of_nodes')
 JobTimeData = namedtuple('JobTimeData', 'time_needed')
+
+DEFAULT_JOB_DATA_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
 
 job_node_data = [
     JobNodeCharacteristics(3679, 1, 1),  # create 3679 jobs using 1 node.
@@ -44,7 +48,8 @@ job_time_data = [
 
 
 class JobGenerator(object):
-    def __init__(self, timer, cluster, buffer_size=5000):
+    def __init__(self, timer, cluster, buffer_size=5000, static_data=True,
+                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=50):
         """
         initiates a JobGenerator object with given buffer size.
         :param timer: Timer
@@ -55,9 +60,29 @@ class JobGenerator(object):
         self.timer = timer
         self.cluster = cluster
         self.available_jobs = []
-        self.generate_job_batch()
+        self.static_data = static_data
+        self.file_directory_path = file_directory_path
+        self.comm_sensitive_percentage = comm_sensitive_percentage
+        if static_data:
+            self._load_job_batch()
+        else:
+            self._generate_job_batch()
 
-    def generate_job_batch(self):
+    def _load_job_batch(self):
+        def parse_time(str_):
+            hours, minutes, _ = str_.split(':')
+            return int(minutes) + int(hours)*60
+
+        with open(os.path.join(self.file_directory_path, 'data_{}.csv'.format(self.comm_sensitive_percentage))) as f:
+            jobs_raw = f.readlines()
+            jobs_splitted = [x.split(',') for x in jobs_raw]
+            job_batch = [Job(job_id, parse_time(job_tuple[8]), int(job_tuple[9]), 1, self.timer, self.cluster) for
+                         job_tuple, job_id in
+                         zip(jobs_splitted, xrange(1, 1 + len(jobs_splitted)))]
+
+            self.available_jobs.extend(job_batch)
+
+    def _generate_job_batch(self):
         """
         Creates a new batch of jobs according to the given distribution (top of this file) and appends it to the job list.
 
@@ -105,7 +130,10 @@ class JobGenerator(object):
         :return: [Job]
         """
         while no_of_jobs > len(self.available_jobs):
-            self.generate_job_batch()
+            if self.static_data:
+                raise NoMoreStaticDataException()
+            else:
+                self._generate_job_batch()
         list_to_draw = self.available_jobs[:no_of_jobs]
         self.available_jobs = self.available_jobs[no_of_jobs + 1:]
         return list_to_draw

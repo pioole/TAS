@@ -9,3 +9,7 @@ class BinTooSmallException(Exception):
 
 class UnAuthorisedAccessException(Exception):
     pass
+
+
+class NoMoreStaticDataException(Exception):
+    pass
