@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from src.performance import perf
 
 Point = namedtuple('Point', 'x y')
 Rectangle = namedtuple('Rectangle', 'top_left_point height width')
@@ -69,16 +70,15 @@ def get_available_rectangles(histogram, depth):
 
     rectangles = []
 
-    for hist_part in indices:
-        h1 = histogram[hist_part[0]]
-        h2 = histogram[hist_part[1]]
+    for area_length in xrange(0, len(histogram)):  # single columns
+        h = histogram[area_length]
+        if h > 0:
+            rectangles.append(Rectangle(Point(area_length, depth), h, 1))
+
+    for hist_part in indices:  # rects between given indices
         common_min = min([histogram[x] for x in xrange(hist_part[0], hist_part[1] + 1)])
         w = hist_part[1] - hist_part[0] + 1
 
-        if h1 > 0:
-            rectangles.append(Rectangle(Point(hist_part[0], depth), h1, 1))
-        if h2 > 0:
-            rectangles.append(Rectangle(Point(hist_part[1], depth), h2, 1))
         if common_min > 0 and w > 0:
             rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
 
