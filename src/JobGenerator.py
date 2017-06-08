@@ -49,7 +49,7 @@ job_time_data = [
 
 class JobGenerator(object):
     def __init__(self, timer, cluster, buffer_size=5000, static_data=True,
-                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=0):
+                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=50):
         """
         initiates a JobGenerator object with given buffer size.
         :param timer: Timer
