@@ -12,9 +12,9 @@ def main():
             for job in jobs_raw:
                 counter += 1
                 if counter % 10 in xrange(x):
-                    senn = 1
-                else:
                     senn = 0
+                else:
+                    senn = 1
                 f.write('{},'.format(senn) + job)
 
 

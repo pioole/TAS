@@ -49,7 +49,7 @@ job_time_data = [
 
 class JobGenerator(object):
     def __init__(self, timer, cluster, buffer_size=5000, static_data=True,
-                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=50):
+                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=0):
         """
         initiates a JobGenerator object with given buffer size.
         :param timer: Timer
@@ -76,7 +76,7 @@ class JobGenerator(object):
         with open(os.path.join(self.file_directory_path, 'data_{}.csv'.format(self.comm_sensitive_percentage))) as f:
             jobs_raw = f.readlines()
             jobs_splitted = [x.split(',') for x in jobs_raw]
-            job_batch = [Job(job_id, parse_time(job_tuple[8]), int(job_tuple[9]), 1, self.timer, self.cluster) for
+            job_batch = [Job(job_id, parse_time(job_tuple[9]), int(job_tuple[10]), int(job_tuple[0]), self.timer, self.cluster) for
                          job_tuple, job_id in
                          zip(jobs_splitted, xrange(1, 1 + len(jobs_splitted)))]
 
