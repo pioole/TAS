@@ -16,13 +16,13 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
-    cluster = Cluster(cluster_size, plotting=True, minimal_bin_size=minimal_bin_size)
+    cluster = Cluster(cluster_size, plotting=False, minimal_bin_size=minimal_bin_size)
 
     timer = Timer()
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
 
-    cluster.update_job_queue(job_generator.draw_jobs(5000))
+    cluster.update_job_queue(job_generator.draw_jobs(5000), plot=False)
 
     utilizations = []
 

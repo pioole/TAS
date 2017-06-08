@@ -20,6 +20,7 @@ class Cluster(object):
         self.job_queue = JobQueue()
         self.available_bins = []
         self._node_matrix = np.zeros((self.cluster_size.x, self.cluster_size.y, self.cluster_size.z))
+        self.plotting = plotting
         if plotting:
             self.queue_size_plotter = Plotter(1)
             self.plotter3D = Plotter3D(2)
@@ -185,7 +186,8 @@ class Cluster(object):
         logging.info('Current cluster utilization: {}'.format(cluster_utilization))
         job_queue_size = len(self.job_queue)
         logging.info('Current queue size: {}'.format(job_queue_size))
-        self.cluster_utilization_plotter.plot(cluster_utilization)
-        self.queue_size_plotter.plot(job_queue_size)
-        self.plot_3D()
+        if self.plotting:
+            self.cluster_utilization_plotter.plot(cluster_utilization)
+            self.queue_size_plotter.plot(job_queue_size)
+            self.plot_3D()
 
