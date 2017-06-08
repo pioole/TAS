@@ -19,7 +19,11 @@ class Bin(object):
         self.size_y = size_y
         self.size_z = size_z
         self.space_left = self.get_size()
-        self._zigzag_marker = copy.copy(self.anchor_point)
+        self._zigzag_marker = copy.copy(self.anchor_point)  # bottom
+        self._cuboid_marker_y = self.anchor_point.y + size_y - 1  # top
+        self.layer_size = size_x * size_z
+        self._cuboid_space_left_in_last_layer = 0
+        self._cuboid_marker_x = self.anchor_point.x
 
     def __eq__(self, other):
         return self.anchor_point == other.anchor_point and self.size_x == other.size_x and self.size_y == other.size_y and self.size_z == other.size_z
@@ -92,7 +96,9 @@ class Bin(object):
                 self._zigzag_marker = Point3D(self._zigzag_marker.x,  # need to return caret along z axis
                                               self._zigzag_marker.y,
                                               self.anchor_point.z)
-                if self._zigzag_marker.y >= self.anchor_point.y + self.size_y - 1:  # already at the border along y axis
+                if self._zigzag_marker.y >= self.anchor_point.y + self.size_y - 1 \
+                        or self._zigzag_marker.y >= self._cuboid_marker_y - 1:  # already at the border along y axis
+                                                                                # or colliding with cuboid marker
                     raise BinTooSmallException
                 else:
                     self._zigzag_marker = Point3D(self._zigzag_marker.x,
@@ -118,6 +124,7 @@ class Bin(object):
             return self._cuboid_strategy
 
     def _zig_zag_strategy(self, job, cluster):
+        print 'zigzag'
         node_list = []
         for nodes_needed in xrange(job.nodes_needed):
             node_list.append(copy.copy(self._zigzag_marker))
@@ -126,5 +133,80 @@ class Bin(object):
 
         job.posess_nodes(node_list)
 
-    def _cuboid_strategy(self, job):
-        pass
+    def _cuboid_strategy(self, job, cluster):
+        node_list = []
+
+        print 'needed, left', job.nodes_needed, self._cuboid_space_left_in_last_layer
+        if job.nodes_needed <= self._cuboid_space_left_in_last_layer:  # use the layer which was splitted last
+            columns_needed = (job.nodes_needed / self.size_z) + 1
+            for x in xrange(self._cuboid_marker_x, self._cuboid_marker_x + columns_needed):
+                for z in xrange(self.anchor_point.z, self.anchor_point.z + self.size_z):
+                    node_list.append(Point3D(x, self._cuboid_marker_y, z))
+
+            self._cuboid_space_left_in_last_layer -= columns_needed * self.size_z
+            self._cuboid_marker_x += columns_needed
+            print 'a'
+            if self._cuboid_space_left_in_last_layer <= 0:
+                self._cuboid_marker_x = self.anchor_point.x
+                self._cuboid_space_left_in_last_layer = 0
+                self._cuboid_marker_y -= 1
+                print 'b'
+
+        else:
+
+            print '#####'
+            print self._cuboid_marker_y
+            print self._zigzag_marker
+            height_needed = int(job.nodes_needed / self.layer_size) + 1
+            height_available = self._cuboid_marker_y - self._zigzag_marker.y
+
+            print height_needed, height_available
+
+            if height_needed > height_available:
+                raise BinTooSmallException
+
+            if height_needed == 1:  # chance to split layer between multiple communication sensitive jobs
+                if self._cuboid_space_left_in_last_layer != 0:  # abandon splitted layer, was too small apparently
+                    self._cuboid_marker_x = self.anchor_point.x
+                    self._cuboid_space_left_in_last_layer = 0
+                    self._cuboid_marker_y -= 1
+
+                columns_needed = (job.nodes_needed / self.size_z) + 1
+                for x in xrange(self.anchor_point.x, self.anchor_point.x + columns_needed):
+                    for z in xrange(self.anchor_point.z, self.anchor_point.z + self.size_z):
+                        node_list.append(Point3D(x, self._cuboid_marker_y, z))
+
+                self._cuboid_marker_x = self.anchor_point.x
+                self._cuboid_marker_x += columns_needed
+                self._cuboid_space_left_in_last_layer = self.layer_size - columns_needed * self.size_z
+                print 'c'
+                if self._cuboid_space_left_in_last_layer <= 0:
+                    self._cuboid_marker_x = self.anchor_point.x
+                    self._cuboid_space_left_in_last_layer = 0
+                    self._cuboid_marker_y -= 1
+                    print 'd'
+
+            else:
+                if self._cuboid_space_left_in_last_layer != 0:  # abandon splitted layer, will be found as bin.
+                    self._cuboid_marker_x = self.anchor_point.x
+                    self._cuboid_space_left_in_last_layer = 0
+                    self._cuboid_marker_y -= 1
+                    print 'e'
+
+                print self.anchor_point.x, self.anchor_point.x + self.size_x - 1
+                print self.anchor_point.z, self.anchor_point.z + self.size_z - 1
+                print self._cuboid_marker_y - height_needed + 1, self._cuboid_marker_y
+                for x in xrange(self.anchor_point.x, self.anchor_point.x + self.size_x):
+                    for z in xrange(self.anchor_point.z, self.anchor_point.z + self.size_z):
+                        for y in xrange(self._cuboid_marker_y - height_needed + 1, self._cuboid_marker_y + 1):
+                            node_list.append(Point3D(x, y, z))
+                print 'f'
+
+                self._cuboid_marker_y -= height_needed
+                self._cuboid_marker_x = self.anchor_point.x
+                self._cuboid_space_left_in_last_layer = 0
+
+        print job.nodes_needed
+        print len(node_list)
+        print node_list[0].y
+        job.posess_nodes(node_list)
