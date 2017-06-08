@@ -10,8 +10,8 @@ CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.DEBUG
 
 
-def main(minimal_bin_size):
-    ITERATIONS = 20
+def main(minimal_bin_size, comm_sensitivity_percentage):
+    ITERATIONS = 30
 
     logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
@@ -20,7 +20,7 @@ def main(minimal_bin_size):
 
     timer = Timer()
 
-    job_generator = JobGenerator(timer, cluster)
+    job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
 
     cluster.update_job_queue(job_generator.draw_jobs(5000))
 
@@ -33,13 +33,15 @@ def main(minimal_bin_size):
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
 
-    logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {}'.format(utilizations, minimal_bin_size))
-    logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} '.format(np.mean(utilizations), minimal_bin_size))
+    logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(utilizations, minimal_bin_size, comm_sensitivity_percentage))
+    logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(np.mean(utilizations), minimal_bin_size, comm_sensitivity_percentage))
 
     # cluster.queue_size_plotter.preserve_window()
 
 if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
     for x in xrange(1, 24*24, 10):
-        logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'.format(x))
-        main(x)
+        for y in xrange(0, 110, 10):
+            logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
+                         ' and comm_sensitivity_percentage: {}'.format(x, y))
+            main(x, y)
