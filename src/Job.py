@@ -37,14 +37,14 @@ class Job(object):
         except TypeError:
             return False  # Job not started
 
-    def posess_nodes(self, node_list):
+    def posess_nodes(self, node_list, bin_):
         """
         marks nodes given in the node_list as used by this job.
         :param node_list: [Job]
         :return: None
         """
         self.node_list = node_list
-        self.cluster.assign_nodes(self.job_id, node_list, self)
+        self.cluster.assign_nodes(self.job_id, node_list, self, bin_)
 
     def free_nodes(self):
         """

@@ -102,7 +102,7 @@ class Cluster(object):
         self.running_jobs = list(set(self.running_jobs) - set(to_remove))
         return no_of_jobs_removed
 
-    def assign_nodes(self, job_id, node_list, job):
+    def assign_nodes(self, job_id, node_list, job, bin_):
         """
         Assigns nodes from the list to the given job_id, and adds a job to the running jobs list.
         :param job_id: Int
@@ -118,6 +118,12 @@ class Cluster(object):
                                                                                     node.x,
                                                                                     node.y,
                                                                                     node.z))
+                logging.error('job: {}'.format(job))
+                logging.error('sensitive: {}'.format(job.comm_sensitive))
+                logging.error('job nodes: {}'.format(job.node_list))
+                bin_node_list = bin_.generate_point_nodes()
+                bin_node_list_extended = [(point, self._node_matrix[point.x, point.y, point.z]) for point in bin_node_list]
+                logging.error('inside bin: {}'.format(bin_node_list_extended))
                 raise UnAuthorisedAccessException()
         self.running_jobs.append(job)
         job.start_job()

@@ -130,7 +130,7 @@ class Bin(object):
             self.space_left -= 1
             self._move_zig_zag_marker()
 
-        job.posess_nodes(node_list)
+        job.posess_nodes(node_list, self)
 
     def _cuboid_strategy(self, job, cluster):
         node_list = []
@@ -190,4 +190,4 @@ class Bin(object):
                 self._cuboid_marker_x = self.anchor_point.x
                 self._cuboid_space_left_in_last_layer = 0
 
-        job.posess_nodes(node_list)
+        job.posess_nodes(node_list, self)
