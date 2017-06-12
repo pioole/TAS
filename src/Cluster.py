@@ -171,8 +171,9 @@ class Cluster(object):
         returns current fraction of cluster utilization
         :return: Float
         """
-        logging.debug('non-zero values in matrix: {}'.format(np.count_nonzero(self._node_matrix)))
-        return 1. * np.count_nonzero(self._node_matrix) / self._node_matrix.size
+        running_nodes = sum([job.nodes_needed for job in self.running_jobs])
+        logging.debug('non-zero values in matrix: {}'.format(running_nodes))
+        return 1. * running_nodes / self._node_matrix.size
 
     def run_time_tick(self):
         """
