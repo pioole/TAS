@@ -80,6 +80,7 @@ class Cluster(object):
             try:
                 bin_ = self._get_biggest_available_bin()
                 self._mark_bin_as_used(bin_)
+                bin_.check_if_empty(self)
                 bin_.fill_in(self.job_queue, self)
             except BinTooSmallException:
                 pass
@@ -106,6 +107,7 @@ class Cluster(object):
         """
         Assigns nodes from the list to the given job_id, and adds a job to the running jobs list.
         :param job_id: Int
+        :param job: Job
         :param node_list: [Point3D]
         :return:
         """
@@ -121,9 +123,6 @@ class Cluster(object):
                 logging.error('job: {}'.format(job))
                 logging.error('sensitive: {}'.format(job.comm_sensitive))
                 logging.error('job nodes: {}'.format(job.node_list))
-                bin_node_list = bin_.generate_point_nodes()
-                bin_node_list_extended = [(point, self._node_matrix[point.x, point.y, point.z]) for point in bin_node_list]
-                logging.error('inside bin: {}'.format(bin_node_list_extended))
                 raise UnAuthorisedAccessException()
         self.running_jobs.append(job)
         job.start_job()
