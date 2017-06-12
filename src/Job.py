@@ -1,3 +1,6 @@
+import logging
+
+from src.Exceptions import UnAuthorisedAccessException
 
 
 class Job(object):
@@ -22,8 +25,9 @@ class Job(object):
         self.node_list = []
 
     def __str__(self):
-        return 'Job id: {} size:{} work_time: {} nodes:{}'.format(self.job_id,
-                                                                  self.nodes_needed, self.work_time, self.node_list)
+        return 'Job id: {} size:{} work_time: {} nodes:{} sensitive: {}'.format(self.job_id, self.nodes_needed,
+                                                                                self.work_time, self.node_list,
+                                                                                self.comm_sensitive)
 
     def __repr__(self):
         return self.__str__()
