@@ -13,3 +13,7 @@ class UnAuthorisedAccessException(Exception):
 
 class NoMoreStaticDataException(Exception):
     pass
+
+
+class BinNotEmptyException(Exception):
+    pass
