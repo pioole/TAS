@@ -1,16 +1,18 @@
 import numpy as np
 import logging
+import copy
 
 from JobQueue import JobQueue
 from plotting import Plotter
 from plotting3D import Plotter3D
 from src.BinFinder import BinFinder
-from src.Exceptions import NoBinsAvailableException, BinTooSmallException, UnAuthorisedAccessException
+from src.Exceptions import NoBinsAvailableException, BinTooSmallException, UnAuthorisedAccessException, \
+    BackfillJobPriorityException
 from performance import perf
 
 
 class Cluster(object):
-    def __init__(self, cluster_size, plotting=False, minimal_bin_size=1):
+    def __init__(self, cluster_size, timer, plotting=False, minimal_bin_size=1, backfill_depth=0):
         """
         initiates the computing cluster simulation object
         :param cluster_size: Point3D
@@ -27,6 +29,9 @@ class Cluster(object):
             self.cluster_utilization_plotter = Plotter(3)
         self.running_jobs = []
         self.bin_finder = BinFinder(self.cluster_size.x, minimal_bin_size)
+        self.backfill_jobs = []
+        self.backfill_depth = backfill_depth
+        self.timer = timer
 
     @perf
     def update_job_queue(self, job_list, plot=True):
@@ -75,15 +80,23 @@ class Cluster(object):
         fills bins from self.available_bins with jobs from self.job_queue
         :return: None
         """
+        try:
+            first_backfill_job = min(self.backfill_jobs, key=lambda x: x.start_time)
+            max_length = first_backfill_job.start_time - self.timer.time()
+        except ValueError:
+            max_length = 0
+
         filling_in = True
         while filling_in:
             try:
                 bin_ = self._get_biggest_available_bin()
                 self._mark_bin_as_used(bin_)
                 bin_.check_if_empty(self)
-                bin_.fill_in(self.job_queue, self)
+                bin_.fill_in(self.job_queue, self, max_length=max_length)
             except BinTooSmallException:
                 pass
+            except BackfillJobPriorityException:
+                filling_in = False
             except NoBinsAvailableException:
                 filling_in = False
 
@@ -103,7 +116,7 @@ class Cluster(object):
         self.running_jobs = list(set(self.running_jobs) - set(to_remove))
         return no_of_jobs_removed
 
-    def assign_nodes(self, job_id, node_list, job, bin_):
+    def assign_nodes(self, job_id, node_list, job):
         """
         Assigns nodes from the list to the given job_id, and adds a job to the running jobs list.
         :param job_id: Int
@@ -175,6 +188,12 @@ class Cluster(object):
         logging.debug('non-zero values in matrix: {}'.format(running_nodes))
         return 1. * running_nodes / self._node_matrix.size
 
+    def insert_backfill_jobs(self):
+        for job in self.backfill_jobs:
+            if self.timer.time() == job.start_time:
+                job.posess_nodes(job.node_list)
+        self.backfill_jobs = filter(lambda job: job.start_time > self.timer.time(), self.backfill_jobs)
+
     def run_time_tick(self):
         """
         runs one iteration of the packing algorithm. The iteration stops if there is no more space in cluster or if
@@ -184,6 +203,7 @@ class Cluster(object):
         logging.info('### New Time Tick #########################')
         no_of_jobs_removed = self._remove_finished_jobs()
         logging.info('{} jobs removed after last iteration'.format(no_of_jobs_removed))
+        self.insert_backfill_jobs()
         self._update_available_bins_list()
         logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
         self._fill_available_bins()
@@ -192,8 +212,39 @@ class Cluster(object):
         logging.info('Current cluster utilization: {}'.format(cluster_utilization))
         job_queue_size = len(self.job_queue)
         logging.info('Current queue size: {}'.format(job_queue_size))
+
+        print 'depth', self.backfill_depth
+        if self.backfill_depth > 0:
+            blocking_job = self.job_queue.peek_at_first_job()
+            cluster_copy = copy.deepcopy(self)
+            cluster_copy.backfill_depth -= 1
+            intervals = 0
+
+            print 'backfilling', blocking_job.nodes_needed
+            while blocking_job == cluster_copy.job_queue.peek_at_first_job():
+                print 'running inside'
+                cluster_copy.run_time_tick()
+                intervals += 1
+                print intervals, self.timer.time()
+                print blocking_job == cluster_copy.job_queue.peek_at_first_job()
+            backfilled_job = cluster_copy.running_jobs[cluster_copy.running_jobs.index(blocking_job)]
+            print 'sdfsdfsdfsdfsdf', backfilled_job.job_id, backfilled_job.nodes_needed, len(backfilled_job.node_list)
+            blocking_job = self.job_queue.pop_first()
+            blocking_job.node_list = copy.deepcopy(backfilled_job.node_list)
+            blocking_job.start_time = backfilled_job.start_time
+            self.backfill_jobs.append(blocking_job)
+
+            logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
+            self._fill_available_bins()
+            logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
+            cluster_utilization = self.count_cluster_utilization()
+            logging.info('Current cluster utilization: {}'.format(cluster_utilization))
+            job_queue_size = len(self.job_queue)
+            logging.info('Current queue size: {}'.format(job_queue_size))
+
         if self.plotting:
             self.cluster_utilization_plotter.plot(cluster_utilization)
             self.queue_size_plotter.plot(job_queue_size)
             self.plot_3D()
+        self.timer.tick()
 

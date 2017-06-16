@@ -4,7 +4,7 @@ import logging
 from math import ceil
 
 from geometry_utils import Point3D
-from src.Exceptions import BinTooSmallException, BinNotEmptyException
+from src.Exceptions import BinTooSmallException, BinNotEmptyException, BackfillJobPriorityException
 
 
 class Bin(object):
@@ -84,7 +84,7 @@ class Bin(object):
                 logging.error('bin was not empty!')
                 raise BinNotEmptyException
 
-    def fill_in(self, job_queue, cluster):
+    def fill_in(self, job_queue, cluster, max_length=0):
         """
         puts the first job from the list into the cluster
         :raises BinTooSmallException: when the job is too big
@@ -94,9 +94,13 @@ class Bin(object):
         logging.info('FILLING BIN: {} size: {}'.format(self, self.get_size()))
         while True:
             next_job = job_queue.peek_at_first_job()
+            if next_job.work_time > max_length != 0:
+                raise BackfillJobPriorityException
+
             job_size = next_job.nodes_needed
             if job_size > self.space_left:
                 raise BinTooSmallException
+
             strategy = self._get_filling_strategy(next_job)
             strategy(next_job, cluster)
             job_queue.pop_first()
@@ -155,7 +159,7 @@ class Bin(object):
             node_list.append(copy.copy(self._zigzag_marker))
             self.space_left -= 1
 
-        job.posess_nodes(node_list, self)
+        job.posess_nodes(node_list)
 
     def _cuboid_strategy(self, job, cluster):
         node_list = []
@@ -227,4 +231,4 @@ class Bin(object):
                 self._cuboid_marker_x = self.anchor_point.x
                 self._cuboid_space_left_in_last_layer = 0
 
-        job.posess_nodes(node_list, self)
+        job.posess_nodes(node_list)

@@ -17,3 +17,7 @@ class NoMoreStaticDataException(Exception):
 
 class BinNotEmptyException(Exception):
     pass
+
+
+class BackfillJobPriorityException(Exception):
+    pass

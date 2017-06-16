@@ -16,9 +16,8 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
-    cluster = Cluster(cluster_size, plotting=False, minimal_bin_size=minimal_bin_size)
-
     timer = Timer()
+    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=1)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
 
@@ -29,7 +28,6 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     while cluster.work_to_do() and ITERATIONS > 0:
         cluster.run_time_tick()
         utilizations.append(cluster.count_cluster_utilization())
-        timer.tick()
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
 
@@ -42,6 +40,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
     for x in xrange(1, 24*24, 10):
         for y in xrange(0, 110, 10):
-            logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                         ' and comm_sensitivity_percentage: {}'.format(x, y))
-            main(x, y)
+            pass
+    logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
+                 ' and comm_sensitivity_percentage: {}'.format(1, 0))
+    main(1, 0)
