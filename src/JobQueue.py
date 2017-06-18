@@ -1,3 +1,4 @@
+from src.Exceptions import JobQueueEmptyException
 
 
 class JobQueue(object):
@@ -24,14 +25,20 @@ class JobQueue(object):
         Returns the first job from the queue and removes it from queue.
         :return: Job
         """
-        return self.job_list.pop(0)
+        try:
+            return self.job_list.pop(0)
+        except IndexError:
+            raise JobQueueEmptyException
 
     def peek_at_first_job(self):
         """
         Returns the first job from the queue without removing it.
         :return: Job
         """
-        return self.job_list[0]
+        try:
+            return self.job_list[0]
+        except IndexError:
+            raise JobQueueEmptyException
 
     def __len__(self):
         return len(self.job_list)
