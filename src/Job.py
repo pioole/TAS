@@ -25,9 +25,13 @@ class Job(object):
         self.node_list = []
 
     def __str__(self):
-        return 'Job id: {} size:{} work_time: {} nodes:{} sensitive: {}'.format(self.job_id, self.nodes_needed,
-                                                                                self.work_time, self.node_list,
-                                                                                self.comm_sensitive)
+        return 'Job id: {} size:{} work_time: {} nodes:{} sensitive: {} start_time: {}'.format(self.job_id,
+                                                                                               self.nodes_needed,
+                                                                                               self.work_time,
+                                                                                               self.node_list,
+                                                                                               self.comm_sensitive,
+                                                                                               self.start_time
+                                                                                               )
 
     def __eq__(self, other):
         return self.job_id == other.job_id
@@ -40,7 +44,7 @@ class Job(object):
 
     def completed(self):
         try:
-            return self.timer.time() - self.start_time > self.work_time
+            return self.timer.time() - self.start_time >= self.work_time
         except TypeError:
             return False  # Job not started
 
