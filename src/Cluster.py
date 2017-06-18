@@ -213,10 +213,11 @@ class Cluster(object):
         job_queue_size = len(self.job_queue)
         logging.info('Current queue size: {}'.format(job_queue_size))
 
-        if self.backfill_depth > 0:
+        backfill_rounds = self.backfill_depth
+        while backfill_rounds > 0:
             blocking_job = self.job_queue.peek_at_first_job()
             cluster_copy = copy.deepcopy(self)
-            cluster_copy.backfill_depth -= 1
+            cluster_copy.backfill_depth = 0
             intervals = 0
 
             while blocking_job == cluster_copy.job_queue.peek_at_first_job():
@@ -236,6 +237,8 @@ class Cluster(object):
             logging.info('Current cluster utilization: {}'.format(cluster_utilization))
             job_queue_size = len(self.job_queue)
             logging.info('Current queue size: {}'.format(job_queue_size))
+
+            backfill_rounds -= 1
 
         if self.plotting:
             self.cluster_utilization_plotter.plot(cluster_utilization)
