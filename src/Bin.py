@@ -94,7 +94,7 @@ class Bin(object):
         logging.info('FILLING BIN: {} size: {}'.format(self, self.get_size()))
         while True:
             next_job = job_queue.peek_at_first_job()
-            if next_job.work_time > max_length != 0:
+            if next_job.work_time > max_length != -1:
                 raise BackfillJobPriorityException
 
             job_size = next_job.nodes_needed

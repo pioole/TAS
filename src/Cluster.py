@@ -84,7 +84,7 @@ class Cluster(object):
             first_backfill_job = min(self.backfill_jobs, key=lambda x: x.start_time)
             max_length = first_backfill_job.start_time - self.timer.time()
         except ValueError:
-            max_length = 0
+            max_length = -1
 
         filling_in = True
         while filling_in:
@@ -135,7 +135,6 @@ class Cluster(object):
                                                                                     node.z))
                 logging.error('job: {}'.format(job))
                 logging.error('sensitive: {}'.format(job.comm_sensitive))
-                logging.error('job nodes: {}'.format(job.node_list))
                 raise UnAuthorisedAccessException()
         self.running_jobs.append(job)
         job.start_job()
