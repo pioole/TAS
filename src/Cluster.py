@@ -213,20 +213,15 @@ class Cluster(object):
         job_queue_size = len(self.job_queue)
         logging.info('Current queue size: {}'.format(job_queue_size))
 
-        print 'depth', self.backfill_depth
         if self.backfill_depth > 0:
             blocking_job = self.job_queue.peek_at_first_job()
             cluster_copy = copy.deepcopy(self)
             cluster_copy.backfill_depth -= 1
             intervals = 0
 
-            print 'backfilling', blocking_job.nodes_needed
             while blocking_job == cluster_copy.job_queue.peek_at_first_job():
-                print 'running inside'
                 cluster_copy.run_time_tick()
                 intervals += 1
-                print intervals, self.timer.time()
-                print blocking_job == cluster_copy.job_queue.peek_at_first_job()
             backfilled_job = cluster_copy.running_jobs[cluster_copy.running_jobs.index(blocking_job)]
             blocking_job = self.job_queue.pop_first()
             blocking_job.node_list = copy.deepcopy(backfilled_job.node_list)
