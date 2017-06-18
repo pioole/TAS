@@ -34,7 +34,7 @@ class Cluster(object):
         self.timer = timer
 
     @perf
-    def update_job_queue(self, job_list, plot=True):
+    def update_job_queue(self, job_list):
         """
         fills clusters job queue with new list of given jobs.
         Shows the job_size plot when 'plot' is set to True
@@ -43,7 +43,7 @@ class Cluster(object):
         :return: None
         """
         self.job_queue.fill_queue_with_jobs(job_list)
-        if plot:
+        if self.plotting:
             self.queue_size_plotter.plot(len(self.job_queue))
 
     @perf
@@ -228,12 +228,12 @@ class Cluster(object):
                 print intervals, self.timer.time()
                 print blocking_job == cluster_copy.job_queue.peek_at_first_job()
             backfilled_job = cluster_copy.running_jobs[cluster_copy.running_jobs.index(blocking_job)]
-            print 'sdfsdfsdfsdfsdf', backfilled_job.job_id, backfilled_job.nodes_needed, len(backfilled_job.node_list)
             blocking_job = self.job_queue.pop_first()
             blocking_job.node_list = copy.deepcopy(backfilled_job.node_list)
             blocking_job.start_time = backfilled_job.start_time
             self.backfill_jobs.append(blocking_job)
 
+            self._update_available_bins_list()
             logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
             self._fill_available_bins()
             logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
