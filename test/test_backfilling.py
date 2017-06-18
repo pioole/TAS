@@ -9,7 +9,7 @@ from src.geometry_utils import Point3D
 class TestBackfilling(unittest.TestCase):
     def setUp(self):
         self.timer = Timer()
-        self.cluster = Cluster(Point3D(2, 1, 1), plotting=False, timer=self.timer, backfill_depth=1)
+        self.cluster = Cluster(Point3D(1, 1, 2), plotting=False, timer=self.timer, backfill_depth=1)
 
     def test_backfilling(self):
         job_1 = Job(1, 45, 1, 1, self.timer, self.cluster)
@@ -67,6 +67,30 @@ class TestBackfilling(unittest.TestCase):
         self.cluster.run_time_tick()  # 60 - 75
 
         self.assertTrue(b_job not in self.cluster.running_jobs)
+
+    def test_backfilling_1(self):
+        self.cluster = Cluster(Point3D(2, 1, 3), plotting=False, timer=self.timer, backfill_depth=2)
+        job_1 = Job(1, 15, 1, 0, self.timer, self.cluster)
+        job_2 = Job(2, 15, 1, 1, self.timer, self.cluster)
+        job_3 = Job(3, 15, 1, 1, self.timer, self.cluster)
+        job_4 = Job(4, 15, 1, 1, self.timer, self.cluster)
+        job_5 = Job(5, 15, 1, 1, self.timer, self.cluster)
+
+        job_list = [
+            job_1,
+            job_2,
+            job_3,
+            job_4,
+            job_5,
+            Job(6, 1, 1, 1, self.timer, self.cluster),
+            Job(7, 1, 1, 1, self.timer, self.cluster),
+            Job(8, 1, 1, 1, self.timer, self.cluster),
+            Job(9, 1, 1, 1, self.timer, self.cluster),
+            Job(10, 1, 1, 1, self.timer, self.cluster),
+        ]
+        self.cluster.update_job_queue(job_list)
+
+        self.cluster.run_time_tick()  # 0 - 15
 
     def test_backfilling_depth2(self):
         self.cluster.backfill_depth = 2
