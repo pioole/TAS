@@ -10,17 +10,17 @@ from src.geometry_utils import Point3D
 
 class TestBin(unittest.TestCase):
     def setUp(self):
-        self.bin_ = Bin(Point3D(0, 0, 0), 4, 1, 1)
-        self.cluster = Cluster(Point3D(4, 1, 1), plotting=False)
-        self.bin_1 = Bin(Point3D(0, 0, 0), 4, 4, 1)
-        self.cluster1 = Cluster(Point3D(4, 4, 1), plotting=False)
-        self.bin_2 = Bin(Point3D(0, 0, 0), 4, 4, 4)
-        self.cluster2 = Cluster(Point3D(4, 4, 4), plotting=False)
-        self.bin_3 = Bin(Point3D(0, 0, 0), 2, 2, 2)
-        self.cluster3 = Cluster(Point3D(2, 2, 2), plotting=False)
-        self.bin_4 = Bin(Point3D(0, 0, 0), 23, 17, 21)
-        self.cluster4 = Cluster(Point3D(23, 17, 21), plotting=False)
         self.timer = Timer()
+        self.bin_ = Bin(Point3D(0, 0, 0), 4, 1, 1)
+        self.cluster = Cluster(Point3D(4, 1, 1), plotting=False, timer=self.timer)
+        self.bin_1 = Bin(Point3D(0, 0, 0), 4, 4, 1)
+        self.cluster1 = Cluster(Point3D(4, 4, 1), plotting=False, timer=self.timer)
+        self.bin_2 = Bin(Point3D(0, 0, 0), 4, 4, 4)
+        self.cluster2 = Cluster(Point3D(4, 4, 4), plotting=False, timer=self.timer)
+        self.bin_3 = Bin(Point3D(0, 0, 0), 2, 2, 2)
+        self.cluster3 = Cluster(Point3D(2, 2, 2), plotting=False, timer=self.timer)
+        self.bin_4 = Bin(Point3D(0, 0, 0), 23, 17, 21)
+        self.cluster4 = Cluster(Point3D(23, 17, 21), plotting=False, timer=self.timer)
 
     def test_get_filling_strategy(self):
         strategy1 = self.bin_._get_filling_strategy(Job(None, None, None, 0, None, None))

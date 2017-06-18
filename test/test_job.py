@@ -9,7 +9,7 @@ from src.geometry_utils import Point3D
 class TestJob(unittest.TestCase):
     def setUp(self):
         self.timer = Timer(13)
-        self.cluster = Cluster(Point3D(24, 24, 24))
+        self.cluster = Cluster(Point3D(24, 24, 24), plotting=False, timer=self.timer)
 
     def test_job_1(self):
         job = Job(1, 12, 32, 1, self.timer, self.cluster)

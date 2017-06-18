@@ -11,7 +11,7 @@ class TestJobQueue(unittest.TestCase):
     def setUp(self):
         self.queue = JobQueue()
         self.timer = Timer()
-        self.cluster = Cluster(Point3D(24, 24, 24))
+        self.cluster = Cluster(Point3D(24, 24, 24), plotting=False, timer=self.timer)
         self.job1 = Job(1, 12, 32, 1, self.timer, self.cluster)
         self.job2 = Job(2, 12, 32, 1, self.timer, self.cluster)
         self.job3 = Job(3, 12, 32, 1, self.timer, self.cluster)
