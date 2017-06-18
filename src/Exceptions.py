@@ -21,3 +21,7 @@ class BinNotEmptyException(Exception):
 
 class BackfillJobPriorityException(Exception):
     pass
+
+
+class JobQueueEmptyException(Exception):
+    pass
