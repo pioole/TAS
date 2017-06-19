@@ -1,6 +1,7 @@
 import unittest
 
-from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle, get_available_rectangles, rectangles_collide
+from src.MaxRecSize import max_size, max_rectangle_size, Rectangle, Point, find_biggest_rectangle, get_available_rectangles, rectangles_collide, \
+    find_all_rectangles
 
 
 class TestMaxSize(unittest.TestCase):
@@ -36,6 +37,12 @@ class TestGetAvailableRectangles(unittest.TestCase):
         histogram = [2, 1, 2]
         rectangles = get_available_rectangles(histogram, 0)
         self.assertEqual(max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width), Rectangle(top_left_point=Point(x=0, y=0), height=1, width=3))
+
+
+class TestFindAllRectangles(unittest.TestCase):
+    def test_find_all_rectangles(self):
+        layer = [[7., 0.], [0., 0.]]
+        self.assertEqual(find_all_rectangles(layer), [Rectangle(top_left_point=Point(x=1, y=0), height=2, width=1), Rectangle(top_left_point=Point(x=0, y=1), height=1, width=1)])
 
 
 class TestRectanglesCollide(unittest.TestCase):

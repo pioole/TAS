@@ -82,7 +82,7 @@ def get_available_rectangles(histogram, depth):
         if common_min > 0 and w > 0:
             rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
 
-    return overlapping_rectangle_cleaner(rectangles)
+    return rectangles
 
 
 def overlapping_rectangle_cleaner(rectangle_list):
