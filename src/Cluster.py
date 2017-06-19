@@ -189,7 +189,7 @@ class Cluster(object):
 
     def insert_backfill_jobs(self):
         for job in self.backfill_jobs:
-            if self.timer.time() == job.start_time:
+            if self.timer.time() >= job.start_time:
                 job.posess_nodes(job.node_list)
         self.backfill_jobs = filter(lambda job: job.start_time > self.timer.time(), self.backfill_jobs)
 
