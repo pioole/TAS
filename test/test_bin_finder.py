@@ -3,7 +3,6 @@ import numpy as np
 
 from src.Bin import Bin
 from src.BinFinder import BinFinder
-from src.Exceptions import NoBinsAvailableException
 from src.geometry_utils import Point3D
 
 
@@ -51,82 +50,6 @@ class TestCombineLayers(unittest.TestCase):
         self.assertTrue(np.array_equal(desired_output, output_))
 
 
-class TestGetBiggestBinBetweenLayers(unittest.TestCase):
-    def test_get_biggest_bin_between_layers_1(self):
-        bin_finder = BinFinder(3, minimal_bin_size=0)
-
-        input_ = np.array([[[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]],
-                           [[0, 0, 0],
-                            [0, 0, 0],
-                            [0, 0, 0]],
-                           [[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]]])
-
-        desired_output = Bin(Point3D(0, 1, 1), 3, 1, 1)
-
-        output_ = bin_finder.get_biggest_bin_between_layers(0, 2, input_)
-
-        self.assertEqual(desired_output, output_)
-
-    def test_get_biggest_bin_between_layers_2(self):
-        bin_finder = BinFinder(3, minimal_bin_size=0)
-
-        input_ = np.array([[[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]],
-                           [[0, 0, 0],
-                            [0, 0, 0],
-                            [0, 0, 0]],
-                           [[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]]])
-
-        desired_output = Bin(Point3D(1, 0, 0), 1, 3, 3)
-
-        output_ = bin_finder.get_biggest_bin_between_layers(1, 1, input_)
-
-        self.assertEqual(desired_output, output_)
-
-
-class TestGetBiggestBinInMatrix(unittest.TestCase):
-    def test_get_biggest_bin_in_matrix_1(self):
-        bin_finder = BinFinder(3, minimal_bin_size=0)
-
-        input_ = np.array([[[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]],
-                           [[0, 0, 0],
-                            [0, 0, 0],
-                            [0, 0, 0]],
-                           [[1, 1, 1],
-                            [1, 0, 1],
-                            [1, 1, 1]]])
-
-        desired_output = Bin(Point3D(1, 0, 0), 1, 3, 3)
-
-        output_ = bin_finder.get_biggest_bin_in_matrix(input_)
-
-        self.assertEqual(desired_output, output_)
-
-    def test_get_biggest_bin_in_matrix_2(self):
-        bin_finder = BinFinder(3, minimal_bin_size=0)
-
-        input_ = np.array([[[1, 1, 1],
-                            [1, 1, 1],
-                            [1, 1, 1]],
-                           [[1, 1, 1],
-                            [1, 1, 1],
-                            [1, 1, 1]],
-                           [[1, 1, 1],
-                            [1, 1, 1],
-                            [1, 1, 1]]])
-
-        self.assertRaises(NoBinsAvailableException, bin_finder.get_biggest_bin_in_matrix, input_)
-
-
 class TestGetAvailableBins(unittest.TestCase):
     def test_get_available_bins_1(self):
         bin_finder = BinFinder(3, minimal_bin_size=0)
@@ -171,6 +94,63 @@ class TestGetAvailableBins(unittest.TestCase):
 
         self.assertEqual(set(output_), set(desired_output))
 
+    def test_get_available_bins_3(self):
+        bin_finder = BinFinder(1, minimal_bin_size=0)
+
+        input_ = np.array([[[7.,  0.],
+                            [0.,  0.]],
+                           ])
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        self.assertEqual(sum([bin_.get_size() for bin_ in output_]), 3)
+
+    def test_get_available_bins_4(self):
+        bin_finder = BinFinder(2, minimal_bin_size=0)
+
+        input_ = np.array([[[7.,  0.],
+                            [0.,  0.]],
+                           [[0.,  0.],
+                            [0.,  0.]]])
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        self.assertEqual(sum([bin_.get_size() for bin_ in output_]), 7)
+
+    def test_get_available_bins_5(self):
+        bin_finder = BinFinder(3, minimal_bin_size=0)
+
+        input_ = np.array([[[0., 0., 0.],
+                            [0., 0., 0.],
+                            [0., 6., 0.]],
+                           [[0., 0., 0.],
+                            [0., 0., 0.],
+                            [0., 0., 0.]],
+                           [[0., 0., 0.],
+                            [0., 0., 0.],
+                            [0., 0., 0.]]])
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        self.assertEqual(sum([bin_.get_size() for bin_ in output_]), 26)
+
+    def test_get_available_bins_6(self):
+        bin_finder = BinFinder(3, minimal_bin_size=0)
+
+        input_ = np.array([[[1., 0., 0.],
+                            [0., 0., 0.],
+                            [0., 0., 0.]],
+                           [[0., 0., 0.],
+                            [0., 1., 0.],
+                            [0., 0., 0.]],
+                           [[0., 0., 0.],
+                            [0., 0., 0.],
+                            [0., 0., 0.]]])
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        self.assertEqual(sum([bin_.get_size() for bin_ in output_]), 25)
+
 
 class TestOverlappingBinCleaner(unittest.TestCase):
     def test_overlapping_bin_cleaner(self):
@@ -213,3 +193,6 @@ class TestBinsCollide(unittest.TestCase):
         bin2 = Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
 
         self.assertTrue(BinFinder.bins_collide(bin2, bin1))
+
+if __name__ == '__main__':
+    unittest.main()

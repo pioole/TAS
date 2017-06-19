@@ -3,7 +3,7 @@ import logging
 
 from src.Bin import Bin
 from src.Exceptions import NoBinsAvailableException
-from src.MaxRecSize import find_biggest_rectangle, find_all_rectangles
+from src.MaxRecSize import find_all_rectangles
 from src.geometry_utils import Point3D
 from performance import perf
 
@@ -36,34 +36,6 @@ class BinFinder(object):
 
         return bin_list
 
-    @staticmethod
-    @perf
-    def mark_space_as_used(matrix, bin_):
-        """
-        fills the space taken by the given bin in given matrix (in situ)
-        :param matrix: 3d np array
-        :param bin_: Bin
-        :return: None
-        """
-        used_nodes = bin_.generate_point_nodes()
-        for node in used_nodes:
-                matrix[node.x][node.y][node.z] = 1
-
-    @perf
-    def get_biggest_bin_in_matrix(self, matrix):
-        """
-        returns the biggest bin available in given matrix
-        :param matrix: 3d np array
-        :return: Bin
-        """
-        available_bins = self.get_biggest_bins_in_matrix(matrix)
-        try:
-            biggest_bin = max(available_bins, key=lambda bin_: bin_.get_size())
-        except ValueError:
-            raise NoBinsAvailableException
-
-        return biggest_bin
-
     @perf
     def get_biggest_bins_in_matrix(self, matrix):
         """
@@ -78,22 +50,9 @@ class BinFinder(object):
 
         return BinFinder.overlapping_bin_cleaner(available_bins)
 
-    def get_biggest_bin_between_layers(self, bottom_layer, top_layer, matrix):
-        """
-        finds and creates a biggest bin in given matrix which fits between top and bottom layer inclusive.
-        the returned bin must 'touch' both top and bottom layer
-        :param top_layer: Int
-        :param bottom_layer: Int
-        :param matrix: 3d np array
-        :return: Bin
-        """
-        available_bins = self.get_biggest_bins_between_layers(bottom_layer, top_layer, matrix)
-
-        return max(available_bins, key=lambda bin_: bin_.get_size())
-
     def get_biggest_bins_between_layers(self, bottom_layer, top_layer, matrix):
         """
-        returns the list of biggest non-colliding bins in given matrix which fits between top and bottom layer inclusive.
+        returns the list of biggest colliding bins in given matrix which fits between top and bottom layer inclusive.
         the returned bins must 'touch' both top and bottom layer
         :param top_layer: Int
         :param bottom_layer: Int
@@ -110,7 +69,7 @@ class BinFinder(object):
             bin = Bin(anchor_point, top_layer - bottom_layer + 1, rect.height, rect.width)
             bin_list.append(bin)
 
-        return BinFinder.overlapping_bin_cleaner(bin_list)
+        return bin_list
 
     def combine_layers(self, bottom_layer, top_layer, matrix):
         """

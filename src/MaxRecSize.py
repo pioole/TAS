@@ -7,19 +7,9 @@ Rectangle = namedtuple('Rectangle', 'top_left_point height width')
 Histogram = namedtuple('Histogram', 'value_list depth')
 
 
-def max_size(matrix, empty_value=0):
-    max_rectangle = find_biggest_rectangle(matrix, empty_value)
-    return [(max_rectangle.height, max_rectangle.width), max_rectangle.top_left_point.y + max_rectangle.height - 1, max_rectangle.top_left_point.x, max_rectangle.top_left_point.x + max_rectangle.width -1]
-
-
-def find_biggest_rectangle(matrix, empty_value=0):
-    rectangles = find_all_rectangles(matrix, empty_value)
-    return max(rectangles, key=lambda rectangle: rectangle.height * rectangle.width)
-
-
 def find_all_rectangles(matrix, empty_value=0):
     """
-    returns biggest available non-colliding rectangles from given matrix
+    returns biggest available colliding rectangles from given matrix
     :param matrix: np array
     :param empty_value: Int
     :return: [Rectangle]
@@ -48,7 +38,7 @@ def find_all_rectangles(matrix, empty_value=0):
         rectangle_list = get_available_rectangles(histogram.value_list, histogram.depth)
         rectangles.extend(rectangle_list)
 
-    return overlapping_rectangle_cleaner(rectangles)
+    return rectangles
 
 
 def max_rectangle_size(histogram, depth):
@@ -58,13 +48,13 @@ def max_rectangle_size(histogram, depth):
 
 def get_available_rectangles(histogram, depth):
     """
-    returns biggest available non-colliding rectangles from given histogram
+    returns biggest available colliding rectangles from given histogram
     :param histogram: Histogram
     :param depth: Int
     :return: [Rectangle]
     """
     indices = []
-    for area_length in xrange(0, len(histogram)):
+    for area_length in xrange(1, len(histogram)):
         for start_index in xrange(len(histogram)-area_length):
             indices.append((start_index, start_index + area_length))
 
@@ -72,15 +62,16 @@ def get_available_rectangles(histogram, depth):
 
     for area_length in xrange(0, len(histogram)):  # single columns
         h = histogram[area_length]
-        if h > 0:
-            rectangles.append(Rectangle(Point(area_length, depth), h, 1))
+        for x_h in xrange(1, h + 1):
+            rectangles.append(Rectangle(Point(area_length, depth), x_h, 1))
 
     for hist_part in indices:  # rects between given indices
         common_min = min([histogram[x] for x in xrange(hist_part[0], hist_part[1] + 1)])
         w = hist_part[1] - hist_part[0] + 1
 
-        if common_min > 0 and w > 0:
-            rectangles.append(Rectangle(Point(hist_part[0], depth), common_min, w))
+        if w > 0:
+            for x_h in xrange(1, common_min + 1):
+                rectangles.append(Rectangle(Point(hist_part[0], depth), x_h, w))
 
     return rectangles
 
