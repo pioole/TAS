@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 
+
 from src.Bin import Bin
 from src.Exceptions import NoBinsAvailableException
 from src.MaxRecSize import find_all_rectangles
@@ -29,14 +30,25 @@ class BinFinder(object):
         :return: [Bin]
         """
         node_matrix_mutable = np.copy(node_matrix)
+        bin_list_end = []
 
-        bin_list_unfiltered = self.get_biggest_bins_in_matrix(node_matrix_mutable)
-        bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list_unfiltered)
-        logging.info('No of bins found: {}, above minimal size: {}'.format(len(bin_list_unfiltered), len(bin_list)))
+        chance = True
+        while chance:
+            bin_list_unfiltered = self.get_biggest_bins_in_matrix(node_matrix_mutable)
+            bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list_unfiltered)
+            for bin_ in bin_list:
+                for node in bin_.generate_point_nodes():
+                    node_matrix_mutable[node.x][node.y][node.z] = 1
+            # print node_matrix_mutable
+            bin_list_end.extend(bin_list)
+            if len(bin_list) == 0:
+                chance = False
 
-        return bin_list
+        logging.info('No of bins found: {}'.format(len(bin_list_end)))
 
-    @perf
+        return bin_list_end
+
+    # @perf
     def get_biggest_bins_in_matrix(self, matrix):
         """
         returns the list of biggest non-colliding bins available in given matrix
@@ -44,13 +56,19 @@ class BinFinder(object):
         :return: Bin
         """
         available_bins = []
+        layer_list = np.split(matrix, self.cluster_side_length)
+
         for x in xrange(0, self.cluster_side_length):
             for y in xrange(x, self.cluster_side_length):
-                available_bins.extend(BinFinder.get_biggest_bins_between_layers(self, x, y, matrix))
+                available_bins.extend(BinFinder.get_biggest_bins_between_layers(self, x, y, layer_list))
+                # print available_bins
 
-        return BinFinder.overlapping_bin_cleaner(available_bins)
+        try:
+            return [max(available_bins, key=lambda bin_: bin_.get_size())]
+        except ValueError:
+            return []
 
-    def get_biggest_bins_between_layers(self, bottom_layer, top_layer, matrix):
+    def get_biggest_bins_between_layers(self, bottom_layer, top_layer, layer_list):
         """
         returns the list of biggest colliding bins in given matrix which fits between top and bottom layer inclusive.
         the returned bins must 'touch' both top and bottom layer
@@ -59,19 +77,24 @@ class BinFinder(object):
         :param matrix: 3d np array
         :return: [Bin]
         """
-        combined_layer = self.combine_layers(bottom_layer, top_layer, matrix)
+        combined_layer = self.combine_layers(bottom_layer, top_layer, layer_list)
         rectangle_list = find_all_rectangles(combined_layer)
         bin_list = []
         for rect in rectangle_list:
+            # print rect
             anchor_point = Point3D(bottom_layer,
-                                   rect.top_left_point.y,
-                                   rect.top_left_point.x)
+                                   rect.top_left_point.x,
+                                   rect.top_left_point.y)
             bin = Bin(anchor_point, top_layer - bottom_layer + 1, rect.height, rect.width)
+            # print bin
             bin_list.append(bin)
 
-        return bin_list
+        try:
+            return [max(bin_list, key=lambda bin_: bin_.get_size())]
+        except ValueError:
+            return []
 
-    def combine_layers(self, bottom_layer, top_layer, matrix):
+    def combine_layers(self, bottom_layer, top_layer, layer_list):
         """
         returns a 2d numpy array with '0' value in places which are free in all of the 2d arrays from 'bottom layer' to
         'top layer' according to z axis
@@ -80,11 +103,11 @@ class BinFinder(object):
         :param matrix: 3d np array
         :return: 2d np array
         """
-        layer_list = np.split(matrix, self.cluster_side_length)
         layers_to_combine = layer_list[bottom_layer:top_layer + 1]
         return np.sum(layers_to_combine, axis=0)[0]
 
     @staticmethod
+    @perf
     def overlapping_bin_cleaner(bin_list):
         """
         gets a list of bins and returns a list of biggest non-colliding bins. Bins shall be of size greater than 0.

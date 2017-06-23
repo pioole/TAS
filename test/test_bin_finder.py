@@ -1,9 +1,11 @@
 import unittest
 import numpy as np
+import logging
 
 from src.Bin import Bin
 from src.BinFinder import BinFinder
 from src.geometry_utils import Point3D
+from src.performance import perf
 
 
 class TestCombineLayers(unittest.TestCase):
@@ -23,6 +25,8 @@ class TestCombineLayers(unittest.TestCase):
         desired_output = np.array([[2, 2, 2],
                                    [2, 0, 2],
                                    [2, 2, 2]])
+
+        input_ = np.split(input_, 3)
 
         output_ = bin_finder.combine_layers(0, 2, input_)
 
@@ -44,6 +48,8 @@ class TestCombineLayers(unittest.TestCase):
         desired_output = np.array([[1, 1, 1],
                                    [1, 0, 1],
                                    [1, 1, 1]])
+
+        input_ = np.split(input_, 3)
 
         output_ = bin_finder.combine_layers(0, 1, input_)
 
@@ -151,12 +157,41 @@ class TestGetAvailableBins(unittest.TestCase):
 
         self.assertEqual(sum([bin_.get_size() for bin_ in output_]), 25)
 
+    @perf
+    def test_get_available_bins_7(self):
+        side = 24
+
+        bin_finder = BinFinder(side, minimal_bin_size=0)
+
+        input_ = np.zeros((side, side, side))
+
+        output_ = bin_finder.get_available_bins(input_)
+
+        self.assertEqual(sum([bin_.get_size() for bin_ in output_]), side*side*side)
+
 
 class TestOverlappingBinCleaner(unittest.TestCase):
+    @perf
     def test_overlapping_bin_cleaner(self):
         bin_list = [Bin(Point3D(x=0, y=0, z=0), 1, 2, 2),
                     Bin(Point3D(x=0, y=0, z=1), 1, 2, 1),
                     Bin(Point3D(x=0, y=0, z=1), 1, 22, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 1, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 24, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 24, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 24, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 24, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
+                    ]
+
+        self.assertEqual(BinFinder.overlapping_bin_cleaner(bin_list), [Bin(Point3D(x=0, y=0, z=0), 24, 24, 24)])
+
+    def test_overlapping_bin_cleaner_1(self):
+        bin_list = [Bin(Point3D(x=0, y=0, z=0), 1, 2, 2),
+                    Bin(Point3D(x=0, y=0, z=1), 1, 2, 1),
+                    Bin(Point3D(x=0, y=0, z=1), 1, 22, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 1, 24, 24),
+                    Bin(Point3D(x=0, y=0, z=0), 1, 24, 24),
                     Bin(Point3D(x=0, y=0, z=0), 1, 24, 24)
                     ]
 
