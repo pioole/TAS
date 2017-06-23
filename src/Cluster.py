@@ -52,7 +52,10 @@ class Cluster(object):
         Finds all available bins and puts them into available_bins list.
         :return: None
         """
+        running_nodes = np.count_nonzero(self._node_matrix)
+        logging.debug('zero values in matrix: {}'.format(self._node_matrix.size - running_nodes))
         self.available_bins = self.bin_finder.get_available_bins(self._node_matrix)
+        logging.debug('bin summary size: {}'.format(sum([bin_.get_size() for bin_ in self.available_bins])))
 
     def _mark_bin_as_used(self, bin_):
         """
@@ -60,7 +63,6 @@ class Cluster(object):
         :param bin_: Bin
         :return: None
         """
-        logging.info('removing bin: {}'.format(bin_))
         self.available_bins.remove(bin_)
 
     def _get_biggest_available_bin(self):
@@ -69,7 +71,6 @@ class Cluster(object):
         :return: Bin
         """
         try:
-            logging.info('max bin: {}'.format(max(self.available_bins, key=lambda bin_: bin_.get_size())))
             return max(self.available_bins, key=lambda bin_: bin_.get_size())
         except ValueError:
             raise NoBinsAvailableException()
