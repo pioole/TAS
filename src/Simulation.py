@@ -17,11 +17,11 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
     timer = Timer()
-    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=1)
+    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=3)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
 
-    cluster.update_job_queue(job_generator.draw_jobs(5000), plot=False)
+    cluster.update_job_queue(job_generator.draw_jobs(5000))
 
     utilizations = []
 
@@ -42,5 +42,5 @@ if __name__ == "__main__":
         for y in xrange(0, 110, 10):
             pass
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}'.format(1, 0))
-    main(1, 0)
+                 ' and comm_sensitivity_percentage: {}'.format(1, 100))
+    main(1, 100)
