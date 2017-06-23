@@ -91,7 +91,6 @@ class Bin(object):
         :param job_queue: JobQueue
         :return: None
         """
-        logging.info('FILLING BIN: {} size: {}'.format(self, self.get_size()))
         while True:
             next_job = job_queue.peek_at_first_job()
             if next_job.work_time > max_length != -1:
