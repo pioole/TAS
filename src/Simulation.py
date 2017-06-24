@@ -17,22 +17,40 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
     timer = Timer()
-    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=3)
+    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=0)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
 
     cluster.update_job_queue(job_generator.draw_jobs(5000))
 
     utilizations = []
+    jobs_in_queue = []
+    needed_nodes = []
+    taken_nodes = []
+    first_job_in_queue_id = []
+    backfilled_jobs_ids = []
 
     while cluster.work_to_do() and ITERATIONS > 0:
         cluster.run_time_tick()
         utilizations.append(cluster.count_cluster_utilization())
+
+        jobs_in_queue.append(len(cluster.job_queue.job_list))
+        needed_nodes.append(sum([job.nodes_needed for job in cluster.running_jobs]))
+        taken_nodes.append(np.count_nonzero(cluster._node_matrix))
+        first_job_in_queue_id.append(cluster.job_queue.peek_at_first_job().job_id)
+        backfilled_jobs_ids.append([(job.job_id, job.start_time) for job in cluster.backfill_jobs])
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
 
     logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(utilizations, minimal_bin_size, comm_sensitivity_percentage))
     logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(np.mean(utilizations), minimal_bin_size, comm_sensitivity_percentage))
+
+    print utilizations
+    print jobs_in_queue
+    print needed_nodes
+    print taken_nodes
+    print first_job_in_queue_id
+    print backfilled_jobs_ids
 
     # cluster.queue_size_plotter.preserve_window()
 
@@ -42,5 +60,5 @@ if __name__ == "__main__":
         for y in xrange(0, 110, 10):
             pass
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}'.format(1, 100))
-    main(1, 100)
+                 ' and comm_sensitivity_percentage: {}'.format(401, 0))
+    main(401, 0)
