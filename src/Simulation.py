@@ -7,7 +7,7 @@ from src.Timer import Timer
 from src.geometry_utils import Point3D
 
 CLUSTER_SIDE_LENGTH = 24
-LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = logging.INFO
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):

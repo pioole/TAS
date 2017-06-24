@@ -44,7 +44,7 @@ class BinFinder(object):
             if len(bin_list) == 0:
                 chance = False
 
-        logging.info('No of bins found: {}'.format(len(bin_list_end)))
+        logging.debug('No of bins found: {}'.format(len(bin_list_end)))
 
         return bin_list_end
 

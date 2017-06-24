@@ -200,18 +200,18 @@ class Cluster(object):
         the job queue is empty.
         :return:
         """
-        logging.info('### New Time Tick #########################')
+        logging.debug('### New Time Tick #########################')
         no_of_jobs_removed = self._remove_finished_jobs()
-        logging.info('{} jobs removed after last iteration'.format(no_of_jobs_removed))
+        logging.debug('{} jobs removed after last iteration'.format(no_of_jobs_removed))
         self.insert_backfill_jobs()
         self._update_available_bins_list()
-        logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
+        logging.debug('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
         self._fill_available_bins()
-        logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
+        logging.debug('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
         cluster_utilization = self.count_cluster_utilization()
-        logging.info('Current cluster utilization: {}'.format(cluster_utilization))
+        logging.debug('Current cluster utilization: {}'.format(cluster_utilization))
         job_queue_size = len(self.job_queue)
-        logging.info('Current queue size: {}'.format(job_queue_size))
+        logging.debug('Current queue size: {}'.format(job_queue_size))
 
         backfill_rounds = self.backfill_depth
         while backfill_rounds > 0:
@@ -230,13 +230,13 @@ class Cluster(object):
             self.backfill_jobs.append(blocking_job)
 
             self._update_available_bins_list()
-            logging.info('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
+            logging.debug('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
             self._fill_available_bins()
-            logging.info('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
+            logging.debug('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
             cluster_utilization = self.count_cluster_utilization()
-            logging.info('Current cluster utilization: {}'.format(cluster_utilization))
+            logging.debug('Current cluster utilization: {}'.format(cluster_utilization))
             job_queue_size = len(self.job_queue)
-            logging.info('Current queue size: {}'.format(job_queue_size))
+            logging.debug('Current queue size: {}'.format(job_queue_size))
 
             backfill_rounds -= 1
 
