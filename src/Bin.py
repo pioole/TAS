@@ -86,25 +86,22 @@ class Bin(object):
                 logging.error('bin was not empty!')
                 raise BinNotEmptyException
 
-    def fill_in(self, job_queue, cluster, max_length=0):
+    def fill_in(self, job, cluster, max_length=0, no_cluster=False):
         """
-        puts the first job from the list into the cluster
+        puts the job into the bin if possible
         :raises BinTooSmallException: when the job is too big
-        :param job_queue: JobQueue
+        :param job: Job
         :return: None
         """
-        while True:
-            next_job = job_queue.peek_at_first_job()
-            if next_job.work_time > max_length != -1:
-                raise BackfillJobPriorityException
+        if job.work_time > max_length != -1:
+            raise BackfillJobPriorityException
 
-            job_size = next_job.nodes_needed
-            if job_size > self.space_left:
-                raise BinTooSmallException
+        job_size = job.nodes_needed
+        if job_size > self.space_left:
+            raise BinTooSmallException
 
-            strategy = self._get_filling_strategy(next_job)
-            strategy(next_job, cluster)
-            job_queue.pop_first()
+        strategy = self._get_filling_strategy(job)
+        strategy(job, cluster, no_cluster)
 
     def _move_zig_zag_marker(self):
         if self._zigzag_marker.x >= self.anchor_point.x + self.size_x - 1:  # already at the border along x axis
@@ -144,7 +141,7 @@ class Bin(object):
         else:
             return self._cuboid_strategy
 
-    def _zig_zag_strategy(self, job, cluster):
+    def _zig_zag_strategy(self, job, cluster, no_cluster):
         node_list = []
         if self._zigzag_marker.y >= self._cuboid_marker_y:
             raise BinTooSmallException
@@ -159,7 +156,24 @@ class Bin(object):
             node_list.append(copy.copy(self._zigzag_marker))
             self.space_left -= 1
 
-        job.posess_nodes(node_list)
+        if not no_cluster:
+            job.posess_nodes(node_list)
+
+    def count_internal_fragmentation(self, job_size):
+        """
+        only for cuboid allocation!
+        :param job_size:
+        :return:
+        """
+        best_small = self._get_best_fit_for_small_space(job_size)
+        best_mid = self._get_best_fit_for_medium_space(job_size)
+
+        if best_small is not None:
+            return len(best_small) - job_size
+        elif best_mid is not None:
+            return len(best_mid) * self.size_z - job_size
+        else:
+            return job_size % self.layer_size
 
     def _get_best_fit_for_small_space(self, nodes_needed):
         fitting = [small_space for small_space in self.small_job_spaces if len(small_space) >= nodes_needed]
@@ -176,7 +190,7 @@ class Bin(object):
         except ValueError:
             return None
 
-    def _cuboid_strategy(self, job, cluster):
+    def _cuboid_strategy(self, job, cluster, no_cluster):
         node_list = []
 
         best_small = self._get_best_fit_for_small_space(job.nodes_needed)
@@ -260,4 +274,5 @@ class Bin(object):
 
                 self._cuboid_marker_y -= height_needed - 1
 
-        job.posess_nodes(node_list)
+        if not no_cluster:
+            job.posess_nodes(node_list)

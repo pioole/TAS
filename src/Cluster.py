@@ -75,6 +75,26 @@ class Cluster(object):
         except ValueError:
             raise NoBinsAvailableException()
 
+    def _get_best_fit_bin(self, job_size, max_length, job):
+        """
+        finds the best fit available bin
+        :param job_size: Int
+        :return: Bin
+        """
+        available_bins_copy = zip(copy.deepcopy(self.available_bins), self.available_bins)
+
+        # print '%%%%%%%%%%%%%%%%%%%'
+        for bin_ in sorted(available_bins_copy,
+                           key=lambda bin_: (bin_[0].count_internal_fragmentation(job_size), bin_[0].get_size())):
+            # print bin_[0].count_internal_fragmentation(job_size), bin_[0].get_size(), job_size
+            try:
+                bin_[0].fill_in(job, self, max_length, no_cluster=True)
+                return bin_[1]
+            except BinTooSmallException:
+                continue
+
+        raise NoBinsAvailableException
+
     @perf
     def _fill_available_bins(self):
         """
@@ -88,17 +108,21 @@ class Cluster(object):
             max_length = -1
 
         filling_in = True
+
         while filling_in:
+            next_job = self.job_queue.peek_at_first_job()
+
             try:
                 bin_ = self._get_biggest_available_bin()
-                self._mark_bin_as_used(bin_)
-                bin_.check_if_empty(self)
-                bin_.fill_in(self.job_queue, self, max_length=max_length)
-            except BinTooSmallException:
-                pass
+                # bin_ = self._get_best_fit_bin(next_job.nodes_needed, max_length, next_job)
+                bin_.fill_in(next_job, self, max_length=max_length)
+                self.job_queue.pop_first()
+
             except BackfillJobPriorityException:
                 filling_in = False
             except NoBinsAvailableException:
+                filling_in = False
+            except BinTooSmallException:
                 filling_in = False
 
     @perf

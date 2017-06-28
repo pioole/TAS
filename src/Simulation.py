@@ -9,6 +9,7 @@ from src.geometry_utils import Point3D
 CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.INFO
 CROP = 3000
+BACKFILLING_LEVEL = 0
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):
@@ -18,7 +19,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
     timer = Timer()
-    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=0)
+    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=BACKFILLING_LEVEL)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage, crop=CROP)
 
@@ -42,7 +43,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
         backfilled_jobs_ids.append([(job.job_id, job.start_time) for job in cluster.backfill_jobs])
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
-        
+
         if len(cluster.job_queue) <= 2000:
             cluster.update_job_queue(job_generator.draw_jobs(3000))
 
@@ -61,5 +62,5 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
 if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}, backfilling 0, crop {}, size halved, best fit'.format(1, 100, CROP))
+                 ' and comm_sensitivity_percentage: {}, backfilling {}, crop {}, size halved, best fit'.format(1, 100, BACKFILLING_LEVEL, CROP))
     main(1, 100)
