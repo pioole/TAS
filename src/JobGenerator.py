@@ -16,7 +16,7 @@ DEFAULT_JOB_DATA_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file
 
 job_node_data = [
     JobNodeCharacteristics(3679, 1, 1),  # create 3679 jobs using 1 node.
-    JobNodeCharacteristics(876, 2, 9),  # TODO: remove magic numbers
+    JobNodeCharacteristics(876, 2, 9),
     JobNodeCharacteristics(273, 10, 50),
     JobNodeCharacteristics(172, 50, 101)
 ]
@@ -95,7 +95,7 @@ class JobGenerator(object):
         """
         Creates a new batch of jobs according to the given distribution (top of this file) and appends it to the job list.
 
-        For now we only create communication sensitive jobs. #TODO
+        For now we only create communication insensitive jobs. #TODO
 
         :return: None
         """
@@ -122,7 +122,7 @@ class JobGenerator(object):
         time_data = sum(time_data, [])
         node_data = sum(node_data, [])
 
-        assert len(time_data) == len(node_data)  # just in case, as we are using magick numbers..
+        assert len(time_data) == len(node_data)  # just in case
 
         shuffle(node_data)
         shuffle(time_data)
