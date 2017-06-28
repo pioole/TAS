@@ -42,6 +42,9 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
         backfilled_jobs_ids.append([(job.job_id, job.start_time) for job in cluster.backfill_jobs])
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
+        
+        if len(cluster.job_queue) <= 2000:
+            cluster.update_job_queue(job_generator.draw_jobs(3000))
 
     logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(utilizations, minimal_bin_size, comm_sensitivity_percentage))
     logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(np.mean(utilizations), minimal_bin_size, comm_sensitivity_percentage))
