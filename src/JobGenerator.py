@@ -2,6 +2,8 @@ import os
 from collections import namedtuple
 from random import shuffle, randint
 
+from math import ceil
+
 from src.Exceptions import NoMoreStaticDataException
 from src.Job import Job
 
@@ -49,7 +51,7 @@ job_time_data = [
 
 class JobGenerator(object):
     def __init__(self, timer, cluster, buffer_size=5000, static_data=True,
-                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=50):
+                 file_directory_path=DEFAULT_JOB_DATA_DIRECTORY, comm_sensitive_percentage=50, crop=None):
         """
         initiates a JobGenerator object with given buffer size.
         :param timer: Timer
@@ -63,6 +65,10 @@ class JobGenerator(object):
         self.static_data = static_data
         self.file_directory_path = file_directory_path
         self.comm_sensitive_percentage = comm_sensitive_percentage
+        if crop is not None:
+            self.crop = crop
+        else:
+            self.crop = 15000  # big enough not to crop anything.
         if static_data:
             self._load_job_batch()
         else:
@@ -79,7 +85,7 @@ class JobGenerator(object):
         with open(os.path.join(self.file_directory_path, 'data_{}.csv'.format(self.comm_sensitive_percentage))) as f:
             jobs_raw = f.readlines()
             jobs_splitted = [x.split(',') for x in jobs_raw]
-            job_batch = [Job(job_id, parse_time(job_tuple[9]), min(int(job_tuple[10]), 3000), int(job_tuple[0]), self.timer, self.cluster) for
+            job_batch = [Job(job_id, parse_time(job_tuple[9]), min(int(ceil((float(job_tuple[10])/2))), 3000), int(job_tuple[0]), self.timer, self.cluster) for
                          job_tuple, job_id in
                          zip(jobs_splitted, xrange(1, 1 + len(jobs_splitted)))]
 

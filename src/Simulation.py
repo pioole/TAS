@@ -8,6 +8,7 @@ from src.geometry_utils import Point3D
 
 CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.INFO
+CROP = 3000
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):
@@ -19,7 +20,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     timer = Timer()
     cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=0)
 
-    job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage)
+    job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage, crop=CROP)
 
     cluster.update_job_queue(job_generator.draw_jobs(5000))
 
@@ -56,9 +57,6 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
 
 if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
-    for x in xrange(1, 24*24, 10):
-        for y in xrange(0, 110, 10):
-            pass
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}'.format(401, 0))
-    main(401, 0)
+                 ' and comm_sensitivity_percentage: {}, backfilling 0, crop {}, size halved, best fit'.format(1, 100, CROP))
+    main(1, 100)
