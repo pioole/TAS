@@ -25,3 +25,7 @@ class BackfillJobPriorityException(Exception):
 
 class JobQueueEmptyException(Exception):
     pass
+
+
+class NoFittingStrategyException(Exception):
+    pass

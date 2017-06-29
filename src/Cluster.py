@@ -7,12 +7,13 @@ from plotting import Plotter
 from plotting3D import Plotter3D
 from src.BinFinder import BinFinder
 from src.Exceptions import NoBinsAvailableException, BinTooSmallException, UnAuthorisedAccessException, \
-    BackfillJobPriorityException
+    BackfillJobPriorityException, NoFittingStrategyException
 from performance import perf
+from enum import Enum
 
 
 class Cluster(object):
-    def __init__(self, cluster_size, timer, plotting=False, minimal_bin_size=1, backfill_depth=0):
+    def __init__(self, cluster_size, timer, plotting=False, minimal_bin_size=1, backfill_depth=0, fitting_strategy=None):
         """
         initiates the computing cluster simulation object
         :param cluster_size: Point3D
@@ -32,6 +33,15 @@ class Cluster(object):
         self.backfill_jobs = []
         self.backfill_depth = backfill_depth
         self.timer = timer
+        if fitting_strategy is None:
+            self.fitting_strategy = Cluster.FittingStrategy.best_fit
+        else:
+            self.fitting_strategy = fitting_strategy
+
+    class FittingStrategy(Enum):
+        biggest_fit = 1
+        smallest_fit = 2
+        best_fit = 3
 
     @perf
     def update_job_queue(self, job_list):
@@ -83,10 +93,26 @@ class Cluster(object):
         """
         available_bins_copy = zip(copy.deepcopy(self.available_bins), self.available_bins)
 
-        # print '%%%%%%%%%%%%%%%%%%%'
         for bin_ in sorted(available_bins_copy,
                            key=lambda bin_: (bin_[0].count_internal_fragmentation(job_size), bin_[0].get_size())):
-            # print bin_[0].count_internal_fragmentation(job_size), bin_[0].get_size(), job_size
+            try:
+                bin_[0].fill_in(job, self, max_length, no_cluster=True)
+                return bin_[1]
+            except BinTooSmallException:
+                continue
+
+        raise NoBinsAvailableException
+
+    def _get_smallest_fit_bin(self, job_size, max_length, job):
+        """
+        finds the best fit available bin
+        :param job_size: Int
+        :return: Bin
+        """
+        available_bins_copy = zip(copy.deepcopy(self.available_bins), self.available_bins)
+
+        for bin_ in sorted(available_bins_copy,
+                           key=lambda bin_: (bin_[0].get_size(), bin_[0].count_internal_fragmentation(job_size))):
             try:
                 bin_[0].fill_in(job, self, max_length, no_cluster=True)
                 return bin_[1]
@@ -113,8 +139,15 @@ class Cluster(object):
             next_job = self.job_queue.peek_at_first_job()
 
             try:
-                bin_ = self._get_biggest_available_bin()
-                # bin_ = self._get_best_fit_bin(next_job.nodes_needed, max_length, next_job)
+                if self.fitting_strategy == Cluster.FittingStrategy.biggest_fit:
+                    bin_ = self._get_biggest_available_bin()
+                elif self.fitting_strategy == Cluster.FittingStrategy.best_fit:
+                    bin_ = self._get_best_fit_bin(next_job.nodes_needed, max_length, next_job)
+                elif self.fitting_strategy == Cluster.FittingStrategy.smallest_fit:
+                    bin_ = self._get_smallest_fit_bin(next_job.nodes_needed, max_length, next_job)
+                else:
+                    raise NoFittingStrategyException
+
                 bin_.fill_in(next_job, self, max_length=max_length)
                 self.job_queue.pop_first()
 
@@ -123,7 +156,7 @@ class Cluster(object):
             except NoBinsAvailableException:
                 filling_in = False
             except BinTooSmallException:
-                filling_in = False
+                self._mark_bin_as_used(bin_)
 
     @perf
     def _remove_finished_jobs(self):
