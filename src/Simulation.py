@@ -8,8 +8,9 @@ from src.geometry_utils import Point3D
 
 CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.INFO
-CROP = 3000
+CROP = 700
 BACKFILLING_LEVEL = 0
+FITTING_STRATEGY = Cluster.FittingStrategy.smallest_fit
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):
@@ -19,11 +20,15 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
 
     timer = Timer()
-    cluster = Cluster(cluster_size, timer, plotting=False, minimal_bin_size=minimal_bin_size, backfill_depth=BACKFILLING_LEVEL)
+    cluster = Cluster(cluster_size, timer,
+                      plotting=False,
+                      minimal_bin_size=minimal_bin_size,
+                      backfill_depth=BACKFILLING_LEVEL,
+                      fitting_strategy=FITTING_STRATEGY)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage, crop=CROP)
 
-    cluster.update_job_queue(job_generator.draw_jobs(5000))
+    cluster.update_job_queue(job_generator.draw_jobs(15000))
 
     utilizations = []
     jobs_in_queue = []
@@ -35,6 +40,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
     while cluster.work_to_do() and ITERATIONS > 0:
         cluster.run_time_tick()
         utilizations.append(cluster.count_cluster_utilization())
+        logging.info('Utilization: {}'.format(utilizations[-1]))
 
         jobs_in_queue.append(len(cluster.job_queue.job_list))
         needed_nodes.append(sum([job.nodes_needed for job in cluster.running_jobs]))
@@ -44,23 +50,16 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
         logging.info('TIME: {}'.format(timer.time()))
         ITERATIONS -= 1
 
-        if len(cluster.job_queue) <= 2000:
-            cluster.update_job_queue(job_generator.draw_jobs(3000))
+        if len(cluster.job_queue) <= 8000:
+            cluster.update_job_queue(job_generator.draw_jobs(7000))
 
     logging.info('UTILIZATION_LIST: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(utilizations, minimal_bin_size, comm_sensitivity_percentage))
     logging.info('UTILIZATION_MEAN: {} for minimal_bin_size: {} and comm_sensitivity_percentage: {}'.format(np.mean(utilizations), minimal_bin_size, comm_sensitivity_percentage))
-
-    print utilizations
-    print jobs_in_queue
-    print needed_nodes
-    print taken_nodes
-    print first_job_in_queue_id
-    print backfilled_jobs_ids
 
     # cluster.queue_size_plotter.preserve_window()
 
 if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}, backfilling {}, crop {}, size halved, best fit'.format(1, 100, BACKFILLING_LEVEL, CROP))
+                 ' and comm_sensitivity_percentage: {}, backfilling {}, crop {}, size halved, {}'.format(1, 100, BACKFILLING_LEVEL, CROP, FITTING_STRATEGY))
     main(1, 100)
