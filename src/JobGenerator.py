@@ -85,7 +85,7 @@ class JobGenerator(object):
         with open(os.path.join(self.file_directory_path, 'data_{}.csv'.format(self.comm_sensitive_percentage))) as f:
             jobs_raw = f.readlines()
             jobs_splitted = [x.split(',') for x in jobs_raw]
-            job_batch = [Job(job_id, parse_time(job_tuple[9]), min(int(ceil((float(job_tuple[10])/2))), 3000), int(job_tuple[0]), self.timer, self.cluster) for
+            job_batch = [Job(job_id, parse_time(job_tuple[9]), min(int(ceil((float(job_tuple[10])/2))), self.crop), int(job_tuple[0]), self.timer, self.cluster) for
                          job_tuple, job_id in
                          zip(jobs_splitted, xrange(1, 1 + len(jobs_splitted)))]
 
