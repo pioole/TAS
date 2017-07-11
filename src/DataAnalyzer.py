@@ -34,6 +34,30 @@ def main():
         print 'start: ', start_time
         print 'end: ', end_time
 
+        print 'histograms full'
+        for x in xrange(0, 10000, 100):
+            sum_ = 0
+            for job in jobs:
+                if x <= job[2] < x + 100:
+                    sum_ += 1
+            print '{}, {}'.format(x, sum_)
+
+        print 'histograms short'
+        for x in xrange(0, 100, 10):
+            sum_ = 0
+            for job in jobs:
+                if x <= job[2] < x + 10:
+                    sum_ += 1
+            print '{}, {}'.format(x, sum_)
+
+        print 'histograms very short'
+        for x in xrange(0, 10, 1):
+            sum_ = 0
+            for job in jobs:
+                if x <= job[2] < x + 1:
+                    sum_ += 1
+            print '{}, {}'.format(x, sum_)
+
         xe_list = []
         xk_list = []
         percentage_list_xe = []
@@ -56,12 +80,12 @@ def main():
             percentage_list_xe.append(100.*nodes_running_xe/cluster_size_xe)
             percentage_list_xk.append(100.*nodes_running_xk/cluster_size_xk)
             percentage_list.append(100.*(nodes_running_xk + nodes_running_xe)/(cluster_size_xk + cluster_size_xe))
-            print 'time: {}, nodes running xe: {}, nodes running xk: {}, utilization_xe: {}%, utilization_xk: {}%, utilization_whole: {}%'.format(start_time,
-                                                                                                     nodes_running_xe,
-                                                                                                     nodes_running_xk,
-                                                                                                     percentage_list_xe[-1],
-                                                                                                     percentage_list_xk[-1],
-                                                                                                     percentage_list[-1])
+            # print 'time: {}, nodes running xe: {}, nodes running xk: {}, utilization_xe: {}%, utilization_xk: {}%, utilization_whole: {}%'.format(start_time,
+            #                                                                                          nodes_running_xe,
+            #                                                                                          nodes_running_xk,
+            #                                                                                          percentage_list_xe[-1],
+            #                                                                                          percentage_list_xk[-1],
+            #                                                                                          percentage_list[-1])
 
         print 'Mean xk: {}, mean xe: {}, utilization mean: {}%'.format(np.mean(xk_list), np.mean(xe_list), np.mean(percentage_list))
         print 'utilization xe mean: {}%, utilization xk mean: {}%'.format(np.mean(percentage_list_xe), np.mean(percentage_list_xk))
@@ -72,8 +96,6 @@ def main():
                 if x <= xe < x + 10:
                     sum_ += 1
             print '{}, {}'.format(x, sum_)
-
-
 
 
 if __name__ == '__main__':
