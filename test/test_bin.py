@@ -35,28 +35,28 @@ class TestBin(unittest.TestCase):
     def test_bin_too_small(self):
         job1 = Job(1, 1, 15, 1, self.timer, self.cluster)
         strategy = self.bin_._get_filling_strategy(job1)
-        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster)
+        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster, False)
 
     def test_zigzag(self):
         job2 = Job(1, 1, 4, 1, self.timer, self.cluster)
         strategy = self.bin_._get_filling_strategy(job2)
-        strategy(job2, self.cluster)
+        strategy(job2, self.cluster, False)
 
     def test_zigzag_2(self):
         job1 = Job(1, 1, 2, 1, self.timer, self.cluster)
         job2 = Job(1, 1, 2, 1, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
     def test_zigzag_3(self):
         job1 = Job(1, 1, 7, 1, self.timer, self.cluster1)
         job2 = Job(1, 1, 9, 1, self.timer, self.cluster1)
         strategy1 = self.bin_1._get_filling_strategy(job1)
         strategy2 = self.bin_1._get_filling_strategy(job2)
-        strategy1(job1, self.cluster1)
-        strategy2(job2, self.cluster1)
+        strategy1(job1, self.cluster1, False)
+        strategy2(job2, self.cluster1, False)
 
     def test_zigzag_4(self):
         job1 = Job(1, 1, 7, 1, self.timer, self.cluster1)
@@ -65,118 +65,118 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_1._get_filling_strategy(job1)
         strategy2 = self.bin_1._get_filling_strategy(job2)
         strategy3 = self.bin_1._get_filling_strategy(job3)
-        strategy1(job1, self.cluster1)
-        strategy2(job2, self.cluster1)
-        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster1)
+        strategy1(job1, self.cluster1, False)
+        strategy2(job2, self.cluster1, False)
+        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster1, False)
 
     def test_cuboid(self):
         job3 = Job(1, 1, 4, 0, self.timer, self.cluster)
         strategy = self.bin_._get_filling_strategy(job3)
-        strategy(job3, self.cluster)
+        strategy(job3, self.cluster, False)
 
     def test_cuboid_2(self):
         job1 = Job(1, 1, 2, 0, self.timer, self.cluster)
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
     def test_cuboid_3(self):
         job1 = Job(1, 1, 7, 0, self.timer, self.cluster1)  # takes two layers
         job2 = Job(1, 1, 8, 0, self.timer, self.cluster1)
         strategy1 = self.bin_1._get_filling_strategy(job1)
         strategy2 = self.bin_1._get_filling_strategy(job2)
-        strategy1(job1, self.cluster1)
-        strategy2(job2, self.cluster1)
+        strategy1(job1, self.cluster1, False)
+        strategy2(job2, self.cluster1, False)
 
     def test_cuboid_4(self):
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster5)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster5)
         strategy1 = self.bin_5._get_filling_strategy(job1)
         strategy2 = self.bin_5._get_filling_strategy(job2)
-        strategy1(job1, self.cluster5)
-        strategy2(job2, self.cluster5)
+        strategy1(job1, self.cluster5, False)
+        strategy2(job2, self.cluster5, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster6)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster6)
         strategy1 = self.bin_6._get_filling_strategy(job1)
         strategy2 = self.bin_6._get_filling_strategy(job2)
-        strategy1(job1, self.cluster6)
-        strategy2(job2, self.cluster6)
+        strategy1(job1, self.cluster6, False)
+        strategy2(job2, self.cluster6, False)
 
     def test_cuboid_5(self):
         job1 = Job(1, 1, 3, 0, self.timer, self.cluster)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
         job1 = Job(1, 1, 3, 0, self.timer, self.cluster5)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster5)
         strategy1 = self.bin_5._get_filling_strategy(job1)
         strategy2 = self.bin_5._get_filling_strategy(job2)
-        strategy1(job1, self.cluster5)
-        strategy2(job2, self.cluster5)
+        strategy1(job1, self.cluster5, False)
+        strategy2(job2, self.cluster5, False)
 
         job1 = Job(1, 1, 3, 0, self.timer, self.cluster6)  # takes two layers
         job2 = Job(1, 1, 1, 0, self.timer, self.cluster6)
         strategy1 = self.bin_6._get_filling_strategy(job1)
         strategy2 = self.bin_6._get_filling_strategy(job2)
-        strategy1(job1, self.cluster6)
-        strategy2(job2, self.cluster6)
+        strategy1(job1, self.cluster6, False)
+        strategy2(job2, self.cluster6, False)
 
     def test_cuboid_6(self):
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster)  # takes two layers
         job2 = Job(1, 1, 3, 0, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster5)  # takes two layers
         job2 = Job(1, 1, 3, 0, self.timer, self.cluster5)
         strategy1 = self.bin_5._get_filling_strategy(job1)
         strategy2 = self.bin_5._get_filling_strategy(job2)
-        strategy1(job1, self.cluster5)
-        strategy2(job2, self.cluster5)
+        strategy1(job1, self.cluster5, False)
+        strategy2(job2, self.cluster5, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster6)  # takes two layers
         job2 = Job(1, 1, 3, 0, self.timer, self.cluster6)
         strategy1 = self.bin_6._get_filling_strategy(job1)
         strategy2 = self.bin_6._get_filling_strategy(job2)
-        strategy1(job1, self.cluster6)
-        strategy2(job2, self.cluster6)
+        strategy1(job1, self.cluster6, False)
+        strategy2(job2, self.cluster6, False)
 
     def test_cuboid_7(self):
         job1 = Job(1, 1, 2, 0, self.timer, self.cluster)  # takes two layers
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster)
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
 
         job1 = Job(1, 1, 2, 0, self.timer, self.cluster5)  # takes two layers
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster5)
         strategy1 = self.bin_5._get_filling_strategy(job1)
         strategy2 = self.bin_5._get_filling_strategy(job2)
-        strategy1(job1, self.cluster5)
-        strategy2(job2, self.cluster5)
+        strategy1(job1, self.cluster5, False)
+        strategy2(job2, self.cluster5, False)
 
         job1 = Job(1, 1, 2, 0, self.timer, self.cluster6)  # takes two layers
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster6)
         strategy1 = self.bin_6._get_filling_strategy(job1)
         strategy2 = self.bin_6._get_filling_strategy(job2)
-        strategy1(job1, self.cluster6)
-        strategy2(job2, self.cluster6)
+        strategy1(job1, self.cluster6, False)
+        strategy2(job2, self.cluster6, False)
 
     def test_cuboid_8(self):
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster)  # takes two layers
@@ -185,9 +185,9 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_._get_filling_strategy(job1)
         strategy2 = self.bin_._get_filling_strategy(job2)
         strategy3 = self.bin_._get_filling_strategy(job3)
-        strategy1(job1, self.cluster)
-        strategy2(job2, self.cluster)
-        strategy3(job3, self.cluster)
+        strategy1(job1, self.cluster, False)
+        strategy2(job2, self.cluster, False)
+        strategy3(job3, self.cluster, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster5)  # takes two layers
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster5)
@@ -195,9 +195,9 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_5._get_filling_strategy(job1)
         strategy2 = self.bin_5._get_filling_strategy(job2)
         strategy3 = self.bin_5._get_filling_strategy(job3)
-        strategy1(job1, self.cluster5)
-        strategy2(job2, self.cluster5)
-        strategy3(job3, self.cluster5)
+        strategy1(job1, self.cluster5, False)
+        strategy2(job2, self.cluster5, False)
+        strategy3(job3, self.cluster5, False)
 
         job1 = Job(1, 1, 1, 0, self.timer, self.cluster6)  # takes two layers
         job2 = Job(1, 1, 2, 0, self.timer, self.cluster6)
@@ -205,9 +205,9 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_6._get_filling_strategy(job1)
         strategy2 = self.bin_6._get_filling_strategy(job2)
         strategy3 = self.bin_6._get_filling_strategy(job3)
-        strategy1(job1, self.cluster6)
-        strategy2(job2, self.cluster6)
-        strategy3(job3, self.cluster6)
+        strategy1(job1, self.cluster6, False)
+        strategy2(job2, self.cluster6, False)
+        strategy3(job3, self.cluster6, False)
 
     def test_mixed(self):
         job1 = Job(1, 1, 7, 1, self.timer, self.cluster1)
@@ -216,9 +216,9 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_1._get_filling_strategy(job1)
         strategy2 = self.bin_1._get_filling_strategy(job2)
         strategy3 = self.bin_1._get_filling_strategy(job3)
-        strategy1(job1, self.cluster1)
-        strategy2(job2, self.cluster1)
-        strategy3(job3, self.cluster1)
+        strategy1(job1, self.cluster1, False)
+        strategy2(job2, self.cluster1, False)
+        strategy3(job3, self.cluster1, False)
 
     def test_mixed_1(self):
         job1 = Job(1, 1, 31, 1, self.timer, self.cluster2)
@@ -227,9 +227,9 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_2._get_filling_strategy(job1)
         strategy2 = self.bin_2._get_filling_strategy(job2)
         strategy3 = self.bin_2._get_filling_strategy(job3)
-        strategy1(job1, self.cluster2)
-        strategy2(job2, self.cluster2)
-        strategy3(job3, self.cluster2)
+        strategy1(job1, self.cluster2, False)
+        strategy2(job2, self.cluster2, False)
+        strategy3(job3, self.cluster2, False)
 
     def test_mixed_2(self):
         job1 = Job(1, 1, 31, 1, self.timer, self.cluster2)
@@ -238,17 +238,17 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_2._get_filling_strategy(job1)
         strategy2 = self.bin_2._get_filling_strategy(job2)
         strategy3 = self.bin_2._get_filling_strategy(job3)
-        strategy1(job1, self.cluster2)
-        strategy2(job2, self.cluster2)
-        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster2)
+        strategy1(job1, self.cluster2, False)
+        strategy2(job2, self.cluster2, False)
+        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster2, False)
 
     def test_mixed_3(self):
         job2 = Job(2, 1, 1, 1, self.timer, self.cluster2)
         job4 = Job(4, 1, 12, 1, self.timer, self.cluster2)
         strategy2 = self.bin_2._get_filling_strategy(job2)
         strategy4 = self.bin_2._get_filling_strategy(job4)
-        strategy2(job2, self.cluster2)
-        strategy4(job4, self.cluster2)
+        strategy2(job2, self.cluster2, False)
+        strategy4(job4, self.cluster2, False)
 
     def test_mixed_4(self):
         job1 = Job(1, 1, 3, 1, self.timer, self.cluster3)
@@ -257,17 +257,17 @@ class TestBin(unittest.TestCase):
         strategy1 = self.bin_3._get_filling_strategy(job1)
         strategy2 = self.bin_3._get_filling_strategy(job2)
         strategy3 = self.bin_3._get_filling_strategy(job3)
-        strategy1(job1, self.cluster3)
-        strategy2(job2, self.cluster3)
-        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster3)
+        strategy1(job1, self.cluster3, False)
+        strategy2(job2, self.cluster3, False)
+        self.assertRaises(BinTooSmallException, strategy3, job3, self.cluster3, False)
 
     def test_mixed_5(self):
         job1 = Job(1, 1, 1, 1, self.timer, self.cluster3)
         job2 = Job(2, 1, 3, 1, self.timer, self.cluster3)
         strategy1 = self.bin_3._get_filling_strategy(job1)
         strategy2 = self.bin_3._get_filling_strategy(job2)
-        strategy1(job1, self.cluster3)
-        strategy2(job2, self.cluster3)
+        strategy1(job1, self.cluster3, False)
+        strategy2(job2, self.cluster3, False)
 
     def test_mixed_6(self):
         job_list = [
@@ -279,7 +279,7 @@ class TestBin(unittest.TestCase):
         ]
         for job in job_list:
             strategy = self.bin_3._get_filling_strategy(job)
-            strategy(job, self.cluster3)
+            strategy(job, self.cluster3, False)
 
     def test_mixed_7(self):
         job_list = [
@@ -291,7 +291,7 @@ class TestBin(unittest.TestCase):
         ]
         for job in job_list:
             strategy = self.bin_3._get_filling_strategy(job)
-            strategy(job, self.cluster3)
+            strategy(job, self.cluster3, False)
 
     def test_mixed_8(self):
         job_list = [
@@ -304,7 +304,7 @@ class TestBin(unittest.TestCase):
         ]
         for job in job_list:
             strategy = self.bin_2._get_filling_strategy(job)
-            strategy(job, self.cluster2)
+            strategy(job, self.cluster2, False)
 
     def test_mixed_9(self):
         job_list = [
@@ -315,9 +315,9 @@ class TestBin(unittest.TestCase):
         job1 = Job(4, 1, 9, 0, self.timer, self.cluster2)
         for job in job_list:
             strategy = self.bin_2._get_filling_strategy(job)
-            strategy(job, self.cluster2)
+            strategy(job, self.cluster2, False)
         strategy = self.bin_2._get_filling_strategy(job1)
-        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster2)
+        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster2, False)
 
     def test_mixed_10(self):
         job_list = [
@@ -333,15 +333,15 @@ class TestBin(unittest.TestCase):
         ]
         for job in job_list:
             strategy = self.bin_2._get_filling_strategy(job)
-            strategy(job, self.cluster2)
+            strategy(job, self.cluster2, False)
 
     def test_mixed_11(self):
         job1 = Job(1, 1, 8210, 0, self.timer, self.cluster4)
         job2 = Job(2, 1, 1, 1, self.timer, self.cluster4)
         strategy1 = self.bin_4._get_filling_strategy(job1)
         strategy2 = self.bin_4._get_filling_strategy(job2)
-        strategy1(job1, self.cluster4)
-        self.assertRaises(BinTooSmallException, strategy2, job2, self.cluster4)
+        strategy1(job1, self.cluster4, False)
+        self.assertRaises(BinTooSmallException, strategy2, job2, self.cluster4, False)
 
     def test_mixed_12(self):
         job_list = [
@@ -350,9 +350,9 @@ class TestBin(unittest.TestCase):
         job1 = Job(2, 1, 1, 1, self.timer, self.cluster3)
         for job in job_list:
             strategy = self.bin_3._get_filling_strategy(job)
-            strategy(job, self.cluster3)
+            strategy(job, self.cluster3, False)
         strategy = self.bin_3._get_filling_strategy(job1)
-        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster3)
+        self.assertRaises(BinTooSmallException, strategy, job1, self.cluster3, False)
 
 if __name__ == '__main__':
     unittest.main()
