@@ -13,7 +13,8 @@ from enum import Enum
 
 
 class Cluster(object):
-    def __init__(self, cluster_size, timer, plotting=False, minimal_bin_size=1, backfill_depth=0, fitting_strategy=None):
+    def __init__(self, cluster_size, timer, plotting=False, minimal_bin_size=1, backfill_depth=0, fitting_strategy=None,
+                 max_job_size=10000, buffer_size=1000):
         """
         initiates the computing cluster simulation object
         :param cluster_size: Point3D
@@ -37,6 +38,8 @@ class Cluster(object):
             self.fitting_strategy = Cluster.FittingStrategy.best_fit
         else:
             self.fitting_strategy = fitting_strategy
+        self.buffer_size = buffer_size
+        self.max_job_size = max_job_size
 
     class FittingStrategy(Enum):
         biggest_fit = 1
@@ -75,15 +78,20 @@ class Cluster(object):
         """
         self.available_bins.remove(bin_)
 
-    def _get_biggest_available_bin(self):
+    def _get_biggest_available_bin(self, max_length, job):
         """
         returns biggest bin available for filling in, or raises NoBinsAvailableException if there are no available bins.
         :return: Bin
         """
-        try:
-            return max(self.available_bins, key=lambda bin_: bin_.get_size())
-        except ValueError:
-            raise NoBinsAvailableException()
+        available_bins_copy = zip(copy.deepcopy(self.available_bins), self.available_bins)
+
+        for bin_ in sorted(available_bins_copy, key=lambda bin_: bin_[0].get_size(), reverse=True):
+            try:
+                bin_[0].fill_in(job, self, max_length, no_cluster=True)
+                return bin_[1]
+            except BinTooSmallException:
+                continue
+        raise BinTooSmallException
 
     def _get_best_fit_bin(self, job_size, max_length, job):
         """
@@ -100,8 +108,7 @@ class Cluster(object):
                 return bin_[1]
             except BinTooSmallException:
                 continue
-
-        raise NoBinsAvailableException
+        raise BinTooSmallException
 
     def _get_smallest_fit_bin(self, job_size, max_length, job):
         """
@@ -118,8 +125,7 @@ class Cluster(object):
                 return bin_[1]
             except BinTooSmallException:
                 continue
-
-        raise NoBinsAvailableException
+        raise BinTooSmallException
 
     @perf
     def _fill_available_bins(self):
@@ -140,7 +146,7 @@ class Cluster(object):
 
             try:
                 if self.fitting_strategy == Cluster.FittingStrategy.biggest_fit:
-                    bin_ = self._get_biggest_available_bin()
+                    bin_ = self._get_biggest_available_bin(max_length, next_job)
                 elif self.fitting_strategy == Cluster.FittingStrategy.best_fit:
                     bin_ = self._get_best_fit_bin(next_job.nodes_needed, max_length, next_job)
                 elif self.fitting_strategy == Cluster.FittingStrategy.smallest_fit:
@@ -153,10 +159,48 @@ class Cluster(object):
 
             except BackfillJobPriorityException:
                 filling_in = False
-            except NoBinsAvailableException:
-                filling_in = False
             except BinTooSmallException:
-                self._mark_bin_as_used(bin_)
+                filling_in = False
+
+    def _backfill_available_bins(self, buffer_size=1200, max_job_size=100):
+        """
+        fills bins from self.available_bins with jobs from self.job_queue non blocking
+        :return: None
+        """
+        try:
+            first_backfill_job = min(self.backfill_jobs, key=lambda x: x.start_time)
+            max_length = first_backfill_job.start_time - self.timer.time()
+        except ValueError:
+            max_length = -1
+
+        job_index = -1
+        jobs = 0
+
+        while buffer_size > 0:
+            job_index += 1
+            buffer_size -= 1
+            next_job = self.job_queue.job_list[job_index]
+            if next_job.nodes_needed <= max_job_size:
+                try:
+                    if self.fitting_strategy == Cluster.FittingStrategy.biggest_fit:
+                        bin_ = self._get_biggest_available_bin(max_length, next_job)
+                    elif self.fitting_strategy == Cluster.FittingStrategy.best_fit:
+                        bin_ = self._get_best_fit_bin(next_job.nodes_needed, max_length, next_job)
+                    elif self.fitting_strategy == Cluster.FittingStrategy.smallest_fit:
+                        bin_ = self._get_smallest_fit_bin(next_job.nodes_needed, max_length, next_job)
+                    else:
+                        raise NoFittingStrategyException
+
+                    bin_.fill_in(next_job, self, max_length=max_length)
+                    self.job_queue.job_list.remove(next_job)
+                    jobs += 1
+
+                except BackfillJobPriorityException:
+                    pass
+                except BinTooSmallException:
+                    pass
+
+        print 'backfilled ', jobs
 
     @perf
     def _remove_finished_jobs(self):
@@ -288,7 +332,7 @@ class Cluster(object):
 
             self._update_available_bins_list()
             logging.debug('{} BIN(S) AVAILABLE'.format(len(self.available_bins)))
-            self._fill_available_bins()
+            self._backfill_available_bins(max_job_size=self.max_job_size, buffer_size=self.buffer_size)
             logging.debug('{} JOB(S) RUNNING'.format(len(self.running_jobs)))
             cluster_utilization = self.count_cluster_utilization()
             logging.debug('Current cluster utilization: {}'.format(cluster_utilization))

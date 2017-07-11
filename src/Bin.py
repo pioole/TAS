@@ -169,9 +169,9 @@ class Bin(object):
         best_mid = self._get_best_fit_for_medium_space(job_size)
 
         if best_small is not None:
-            return len(best_small) - job_size
+            return 0  # len(best_small) - job_size
         elif best_mid is not None:
-            return len(best_mid) * self.size_z - job_size
+            return job_size % self.size_z  # len(best_mid) * self.size_z - job_size
         else:
             return job_size % self.layer_size
 

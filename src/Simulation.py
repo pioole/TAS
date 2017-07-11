@@ -8,13 +8,15 @@ from src.geometry_utils import Point3D
 
 CLUSTER_SIDE_LENGTH = 24
 LOGGING_LEVEL = logging.INFO
-CROP = 700
-BACKFILLING_LEVEL = 0
-FITTING_STRATEGY = Cluster.FittingStrategy.smallest_fit
+CROP = 3000
+BACKFILLING_LEVEL = 1
+FITTING_STRATEGY = Cluster.FittingStrategy.best_fit
+MAX_JOB_SIZE = 500
+BUFFER_SIZE = 1100
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):
-    ITERATIONS = 30
+    ITERATIONS = 120
 
     logging.basicConfig(level=LOGGING_LEVEL)
     cluster_size = Point3D(CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH, CLUSTER_SIDE_LENGTH)
@@ -24,7 +26,9 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
                       plotting=False,
                       minimal_bin_size=minimal_bin_size,
                       backfill_depth=BACKFILLING_LEVEL,
-                      fitting_strategy=FITTING_STRATEGY)
+                      fitting_strategy=FITTING_STRATEGY,
+                      max_job_size=MAX_JOB_SIZE,
+                      buffer_size=BUFFER_SIZE)
 
     job_generator = JobGenerator(timer, cluster, comm_sensitive_percentage=comm_sensitivity_percentage, crop=CROP)
 
@@ -61,5 +65,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
 if __name__ == "__main__":
     logging.basicConfig(level=LOGGING_LEVEL)
     logging.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\nRUNNING SIMULATION FOR minimal_bin_size={}'
-                 ' and comm_sensitivity_percentage: {}, backfilling {}, crop {}, size halved, {}'.format(1, 100, BACKFILLING_LEVEL, CROP, FITTING_STRATEGY))
+                 ' and comm_sensitivity_percentage: {}, backfilling {}, crop {}, size halved, {}'
+                 ', buffer size: {}, max_job_size: {}'.format(1, 100, BACKFILLING_LEVEL, CROP, FITTING_STRATEGY,
+                                                              BUFFER_SIZE, MAX_JOB_SIZE))
     main(1, 100)
