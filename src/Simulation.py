@@ -13,6 +13,7 @@ BACKFILLING_LEVEL = 1
 FITTING_STRATEGY = Cluster.FittingStrategy.best_fit
 MAX_JOB_SIZE = 500
 BUFFER_SIZE = 1100
+PLOTTING = False
 
 
 def main(minimal_bin_size, comm_sensitivity_percentage):
@@ -23,7 +24,7 @@ def main(minimal_bin_size, comm_sensitivity_percentage):
 
     timer = Timer()
     cluster = Cluster(cluster_size, timer,
-                      plotting=False,
+                      plotting=PLOTTING,
                       minimal_bin_size=minimal_bin_size,
                       backfill_depth=BACKFILLING_LEVEL,
                       fitting_strategy=FITTING_STRATEGY,
