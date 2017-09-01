@@ -4,7 +4,7 @@ import logging
 
 from src.Bin import Bin
 from src.Exceptions import NoBinsAvailableException
-from src.MaxRecSize import find_all_rectangles
+from src.MaxRecSize import find_biggest_rectangle
 from src.geometry_utils import Point3D
 from performance import perf
 
@@ -25,7 +25,7 @@ class BinFinder(object):
     @perf
     def get_available_bins(self, node_matrix):
         """
-        returns the list of all (non colliding) bins available in given matrix. Sorted descending by size.
+        returns the list of all (non colliding) bins available in given matrix.
         :param node_matrix: 3d np array
         :return: [Bin]
         """
@@ -34,7 +34,7 @@ class BinFinder(object):
 
         chance = True
         while chance:
-            bin_list_unfiltered = self.get_biggest_bins_in_matrix(node_matrix_mutable)
+            bin_list_unfiltered = self.get_biggest_bin_in_matrix(node_matrix_mutable)
             bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list_unfiltered)
             for bin_ in bin_list:
                 for node in bin_.generate_point_nodes():
@@ -48,10 +48,9 @@ class BinFinder(object):
 
         return bin_list_end
 
-    # @perf
-    def get_biggest_bins_in_matrix(self, matrix):
+    def get_biggest_bin_in_matrix(self, matrix):
         """
-        returns the list of biggest non-colliding bins available in given matrix
+        returns biggest bin available in given matrix
         :param matrix: 3d np array
         :return: Bin
         """
@@ -60,17 +59,16 @@ class BinFinder(object):
 
         for x in xrange(0, self.cluster_side_length):
             for y in xrange(x, self.cluster_side_length):
-                available_bins.extend(BinFinder.get_biggest_bins_between_layers(self, x, y, layer_list))
-                # print available_bins
+                available_bins.extend(BinFinder.get_biggest_bin_between_layers(self, x, y, layer_list))
 
         try:
             return [max(available_bins, key=lambda bin_: bin_.get_size())]
         except ValueError:
             return []
 
-    def get_biggest_bins_between_layers(self, bottom_layer, top_layer, layer_list):
+    def get_biggest_bin_between_layers(self, bottom_layer, top_layer, layer_list):
         """
-        returns the list of biggest colliding bins in given matrix which fits between top and bottom layer inclusive.
+        returns biggest bin in given matrix which fits between top and bottom layer inclusive.
         the returned bins must 'touch' both top and bottom layer
         :param top_layer: Int
         :param bottom_layer: Int
@@ -78,15 +76,13 @@ class BinFinder(object):
         :return: [Bin]
         """
         combined_layer = self.combine_layers(bottom_layer, top_layer, layer_list)
-        rectangle_list = find_all_rectangles(combined_layer)
+        rectangle_list = find_biggest_rectangle(combined_layer)
         bin_list = []
         for rect in rectangle_list:
-            # print rect
             anchor_point = Point3D(bottom_layer,
                                    rect.top_left_point.x,
                                    rect.top_left_point.y)
             bin = Bin(anchor_point, top_layer - bottom_layer + 1, rect.height, rect.width)
-            # print bin
             bin_list.append(bin)
 
         try:

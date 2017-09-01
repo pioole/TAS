@@ -142,6 +142,13 @@ class Bin(object):
             return self._cuboid_strategy
 
     def _zig_zag_strategy(self, job, cluster, no_cluster):
+        """
+        fill in job using zig zag strategy
+        :param job:
+        :param cluster:
+        :param no_cluster: Bool - used for testing space availability
+        :return:
+        """
         node_list = []
         if self._zigzag_marker.y >= self._cuboid_marker_y:
             raise BinTooSmallException
@@ -191,6 +198,13 @@ class Bin(object):
             return None
 
     def _cuboid_strategy(self, job, cluster, no_cluster):
+        """
+        fill in job using cuboid strategy
+        :param job:
+        :param cluster:
+        :param no_cluster: Bool - used for testing space availability
+        :return:
+        """
         node_list = []
 
         best_small = self._get_best_fit_for_small_space(job.nodes_needed)

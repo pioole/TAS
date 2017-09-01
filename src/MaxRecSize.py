@@ -7,7 +7,12 @@ Rectangle = namedtuple('Rectangle', 'top_left_point height width')
 Histogram = namedtuple('Histogram', 'value_list depth')
 
 
-def find_all_rectangles(matrix):
+def find_biggest_rectangle(matrix):
+    """
+    find biggest rectangle in given matrix.
+    :param matrix: Numpy 2D array
+    :return:
+    """
     def check_right(x, y):
         r_y = y
         try:
