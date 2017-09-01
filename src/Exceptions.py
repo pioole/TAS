@@ -29,3 +29,7 @@ class JobQueueEmptyException(Exception):
 
 class NoFittingStrategyException(Exception):
     pass
+
+
+class NoRectangleException(Exception):
+    pass

@@ -3,7 +3,7 @@ import logging
 
 
 from src.Bin import Bin
-from src.Exceptions import NoBinsAvailableException
+from src.Exceptions import NoBinsAvailableException, NoRectangleException
 from src.MaxRecSize import find_biggest_rectangle
 from src.geometry_utils import Point3D
 from performance import perf
@@ -34,14 +34,13 @@ class BinFinder(object):
 
         chance = True
         while chance:
-            bin_list_unfiltered = self.get_biggest_bin_in_matrix(node_matrix_mutable)
-            bin_list = filter(lambda bin_: bin_.get_size() >= self.minimal_bin_size, bin_list_unfiltered)
-            for bin_ in bin_list:
-                for node in bin_.generate_point_nodes():
-                    node_matrix_mutable[node.x][node.y][node.z] = 1
-            # print node_matrix_mutable
-            bin_list_end.extend(bin_list)
-            if len(bin_list) == 0:
+            try:
+                bin_raw = self.get_biggest_bin_in_matrix(node_matrix_mutable)
+                if bin_raw.get_size() >= self.minimal_bin_size:
+                    for node in bin_raw.generate_point_nodes():
+                        node_matrix_mutable[node.x][node.y][node.z] = 1
+                bin_list_end.append(bin_raw)
+            except NoBinsAvailableException:
                 chance = False
 
         logging.debug('No of bins found: {}'.format(len(bin_list_end)))
@@ -59,12 +58,15 @@ class BinFinder(object):
 
         for x in xrange(0, self.cluster_side_length):
             for y in xrange(x, self.cluster_side_length):
-                available_bins.extend(BinFinder.get_biggest_bin_between_layers(self, x, y, layer_list))
+                try:
+                    available_bins.append(BinFinder.get_biggest_bin_between_layers(self, x, y, layer_list))
+                except NoBinsAvailableException:
+                    pass
 
         try:
-            return [max(available_bins, key=lambda bin_: bin_.get_size())]
+            return max(available_bins, key=lambda bin_: bin_.get_size())
         except ValueError:
-            return []
+            raise NoBinsAvailableException
 
     def get_biggest_bin_between_layers(self, bottom_layer, top_layer, layer_list):
         """
@@ -76,19 +78,18 @@ class BinFinder(object):
         :return: [Bin]
         """
         combined_layer = self.combine_layers(bottom_layer, top_layer, layer_list)
-        rectangle_list = find_biggest_rectangle(combined_layer)
-        bin_list = []
-        for rect in rectangle_list:
+        try:
+            rect = find_biggest_rectangle(combined_layer)
+            bin_list = []
             anchor_point = Point3D(bottom_layer,
                                    rect.top_left_point.x,
                                    rect.top_left_point.y)
             bin = Bin(anchor_point, top_layer - bottom_layer + 1, rect.height, rect.width)
             bin_list.append(bin)
 
-        try:
-            return [max(bin_list, key=lambda bin_: bin_.get_size())]
-        except ValueError:
-            return []
+            return max(bin_list, key=lambda bin_: bin_.get_size())
+        except (ValueError, NoRectangleException):
+            raise NoBinsAvailableException
 
     def combine_layers(self, bottom_layer, top_layer, layer_list):
         """

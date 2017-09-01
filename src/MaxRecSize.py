@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from src.Exceptions import NoRectangleException
 from src.performance import perf
 
 Point = namedtuple('Point', 'x y')
@@ -113,8 +114,9 @@ def find_biggest_rectangle(matrix):
         d_b_done = False
 
     try:
-        return [max(rectangles, key=lambda rect: rect.width * rect.height)]
+        return max(rectangles, key=lambda rect: rect.width * rect.height)
     except ValueError:
-        return []
+        raise NoRectangleException
+
 
 
