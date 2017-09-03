@@ -8,8 +8,10 @@ development: [![Build Status](https://travis-ci.org/pioole/TAS.svg?branch=develo
 prerequisites:
 
     python2.7.x installed with according pip
-    $ pip install -r requirements
-    matplotlib module tested with TkAgg backend
+    In project root:
+    $ pip install -r requirements  # matplotlib module was tested with TkAgg backend
+    $ cd src
+    $ export PYTHONPATH=$(pwd)/..:PYTHONPATH
 
 running:
 
